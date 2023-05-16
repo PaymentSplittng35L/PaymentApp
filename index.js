@@ -2,9 +2,31 @@ import React, { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
 
-import App from "./App";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import SecondPage from "./pages/secondpage";
+import AboutUs from "./pages/AboutUs"
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route>
+          <Route index element={<Home />} />
+          <Route path="secondpage" element={<SecondPage />} />
+          <Route path="AboutUs" element={<AboutUs />} />
+          <Route path="Home" element={<Home />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
 
 const root = createRoot(document.getElementById("root"));
+
+
+
 root.render(
   <StrictMode>
     <App />
