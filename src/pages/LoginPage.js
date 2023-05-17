@@ -1,15 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './Login'
-import './AboutUs.css'
 
-const AboutUs = () => {
+import './LoginPage.css'
+
+const LoginPage = () => {
     return (
         <div>
-        <h1 className="landingtitle">We are in cs35l</h1>
+            
+        <h1 className="landingtitle">This is the login page</h1>
         <button className="button"> <Link to="/Home">Home</Link></button>
         </div>
     );
 };
 
-export default AboutUs;
+export default LoginPage;

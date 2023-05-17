@@ -2,27 +2,46 @@ import React, { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
 
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import Home from "./pages/Home";
 import UserProfile from "./pages/UserProfile";
 import AboutUs from "./pages/AboutUs"
 import Login from "./pages/Login"
+import Register from "./pages/Register";
+import Reset from "./pages/Reset";
+import Dashboard from "./pages/Dboard";
 
-export default function App() {
+function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route>
+    <div className="app">
+      <Router>
+        <Routes>
           <Route index element={<Home />} />
-          <Route path="UserProfile" element={<UserProfile />} />
-          <Route path="AboutUs" element={<AboutUs />} />
-          <Route path="Home" element={<Home />} />
-          <Route path="Login" element={<Login />} />
-        </Route>
+          <Route exact path="/LoginPage" element={<Login />} />
+          <Route exact path="/register" element={<Register />} />
+          <Route exact path="/reset" element={<Reset />} />
+          <Route exact path="/dashboard" element={<Dashboard />} />
+          <Route exact path="AboutUs" element={<AboutUs />} />
+          <Route exact path="Home" element={<Home />} />
+        </Routes>
+      </Router>
+    </div>
+
+
+    /*
+    <Router>
+      <Routes>
+          <Route index element={<Home />} />
+          <Route path="/UserProfile" element={<UserProfile />} />
+          <Route exact path="AboutUs" element={<AboutUs />} />
+          <Route exact path="Home" element={<Home />} />
       </Routes>
-    </BrowserRouter>
+    </Router>
+    */
+
   );
 }
+
 
 
 const root = createRoot(document.getElementById("root"));
@@ -34,7 +53,7 @@ root.render(
     <App />
   </StrictMode>
 );
-
+export default App;
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals

@@ -3,19 +3,18 @@ import './Home.css'
 import homescreenbackground from './homescreenbackground.jpg';
 import { Link } from 'react-router-dom';
 
-//This is the alias for the second page:
-// import SecondPage from './secondpage.js';
 
 function SubHome(){
 
   return (
     <div className="home">
+      
       <img src={homescreenbackground} alt="random" className="background-image" />
       <h1 className="landingtitle">Welcome to SplitPay</h1>
       <h2 className="landingsubtitle">Explore and Discover</h2>
       <div className="buttons">
         <button className="button"> <Link to="/AboutUs">AboutUs</Link></button>
-        <button className="button"> <Link to="/Login">Login</Link></button>
+        <button className="button"> <Link to="/LoginPage">LoginPage</Link></button>
       </div>
     </div>
   );
