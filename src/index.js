@@ -4,8 +4,9 @@ import "./styles.css";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import SecondPage from "./pages/secondpage";
+import UserProfile from "./pages/UserProfile";
 import AboutUs from "./pages/AboutUs"
+import Login from "./pages/Login"
 
 export default function App() {
   return (
@@ -13,9 +14,10 @@ export default function App() {
       <Routes>
         <Route>
           <Route index element={<Home />} />
-          <Route path="secondpage" element={<SecondPage />} />
+          <Route path="UserProfile" element={<UserProfile />} />
           <Route path="AboutUs" element={<AboutUs />} />
           <Route path="Home" element={<Home />} />
+          <Route path="Login" element={<Login />} />
         </Route>
       </Routes>
     </BrowserRouter>

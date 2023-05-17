@@ -14,8 +14,8 @@ function SubHome(){
       <h1 className="landingtitle">Welcome to SplitPay</h1>
       <h2 className="landingsubtitle">Explore and Discover</h2>
       <div className="buttons">
-        <button className="button"><Link to="/secondpage">Login</Link></button>
         <button className="button"> <Link to="/AboutUs">AboutUs</Link></button>
+        <button className="button"> <Link to="/Login">Login</Link></button>
       </div>
     </div>
   );
