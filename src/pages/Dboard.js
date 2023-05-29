@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Dboard.css";
 import { auth, db, logout } from "./firebase";
 import { query, collection, getDocs, where } from "firebase/firestore";
@@ -169,7 +169,7 @@ function Dboard() {
        <div className="Dboard_navbar">
          
           <div className="Dboard_nav_buttons">
-            <button className="Dboard__btn">Manage Groups</button>
+            <button className="Dboard__btn"><Link to="/groups">Manage Groups</Link></button>
             <button className="Dboard__btn">My Payments</button>
             <div class="dropdown">
               <div className = "centered-text">
