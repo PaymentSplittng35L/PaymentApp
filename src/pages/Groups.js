@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 
+
 import "./Groups.css";
 import { auth, db, logout } from "./firebase";
 import { query, collection, getDocs, where } from "firebase/firestore";
@@ -8,7 +9,7 @@ import { Line } from "react-chartjs-2";
 import {MdOutlineDocumentScanner} from 'react-icons/md'
 import {ImListNumbered} from 'react-icons/im'
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
       
 const Groups = () => {
 const [user, loading] = useAuthState(auth);
@@ -41,7 +42,7 @@ return (
     <>
     <div className="button">
         <p>
-        <button> Add New Group?</button>
+        <button> <Link to ="/NewGroup">Add New Group?</Link></button>
         </p>
         
     </div>

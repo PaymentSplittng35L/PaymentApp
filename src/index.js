@@ -11,6 +11,7 @@ import Register from "./pages/Register";
 import Reset from "./pages/Reset";
 import Dashboard from "./pages/Dboard";
 import Groups from "./pages/Groups";
+import NewGroup from "./pages/NewGroup";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route exact path="/reset" element={<Reset />} />
           <Route exact path="/dashboard" element={<Dashboard />} />
           <Route exact path="/groups" element={<Groups />} />
+          <Route exact path="/NewGroup" element={<NewGroup />} />
           <Route exact path="AboutUs" element={<AboutUs />} />
           <Route exact path="Home" element={<Home />} />
         </Routes>
