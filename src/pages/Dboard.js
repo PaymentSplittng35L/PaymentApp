@@ -16,7 +16,6 @@ function Dboard() {
   const [balance,setBalance] = useState(0);
   const navigate = useNavigate();
 
-
   const fetchUserName = async () => {
     try {
       const q = query(collection(db, "users"), where("uid", "==", user?.uid));
@@ -296,7 +295,6 @@ function Dboard() {
     </table>
 
     
-
 
 </div>
     </div>
