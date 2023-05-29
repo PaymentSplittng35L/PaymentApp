@@ -10,14 +10,10 @@ import {ImListNumbered} from 'react-icons/im'
 
 function Dboard() {
   const [user, loading] = useAuthState(auth);
-  const [user, loading] = useAuthState(auth);
   const [name, setName] = useState("");
-  const [groupName, setGroupName] = useState("");
-  const [paidOffStatus, setPaidOffStatus] = useState(true);
   const [balance,setBalance] = useState(0);
   const [groupName, setGroupName] = useState("");
   const [paidOffStatus, setPaidOffStatus] = useState(true);
-  const [balance,setBalance] = useState(0);
   const navigate = useNavigate();
 
   const fetchUserName = async () => {
