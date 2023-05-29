@@ -10,7 +10,11 @@ import {ImListNumbered} from 'react-icons/im'
 
 function Dboard() {
   const [user, loading] = useAuthState(auth);
+  const [user, loading] = useAuthState(auth);
   const [name, setName] = useState("");
+  const [groupName, setGroupName] = useState("");
+  const [paidOffStatus, setPaidOffStatus] = useState(true);
+  const [balance,setBalance] = useState(0);
   const [groupName, setGroupName] = useState("");
   const [paidOffStatus, setPaidOffStatus] = useState(true);
   const [balance,setBalance] = useState(0);
@@ -22,6 +26,7 @@ function Dboard() {
       const doc = await getDocs(q);
       const data = doc.docs[0].data();
       setName(data.name);
+      //console.log(name);
       //console.log(name);
     } catch (err) {
       console.error(err);
