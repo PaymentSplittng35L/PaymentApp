@@ -7,6 +7,8 @@ import { query, collection, getDocs, where } from "firebase/firestore";
 import { Line } from "react-chartjs-2";
 import {MdOutlineDocumentScanner} from 'react-icons/md'
 import {ImListNumbered} from 'react-icons/im'
+import { useLocation} from 'react-router-dom';
+
 
 function Dboard() {
   const [user, loading] = useAuthState(auth);
@@ -15,6 +17,10 @@ function Dboard() {
   const [groupName, setGroupName] = useState("");
   const [paidOffStatus, setPaidOffStatus] = useState(true);
   const navigate = useNavigate();
+
+  const location = useLocation();
+  const currGroupName = location.state && location.state.currGroupName;
+  console.log("The current group name is " + currGroupName);
 
   const fetchUserName = async () => {
     try {
@@ -26,7 +32,7 @@ function Dboard() {
       //console.log(name);
     } catch (err) {
       console.error(err);
-      alert("An error occured while fetching user data");
+      //alert("An error occured while fetching user data");
     }
   };
 
@@ -169,7 +175,7 @@ function Dboard() {
        <div className="Dboard_navbar">
          
           <div className="Dboard_nav_buttons">
-            <button className="Dboard__btn"><Link to="/groups">Manage Groups</Link></button>
+            <button className="Dboard__btn"><Link to="/GroupSelection">Manage Groups</Link></button>
             <button className="Dboard__btn">My Payments</button>
             <div class="dropdown">
               <div className = "centered-text">
@@ -186,7 +192,7 @@ function Dboard() {
        </div>
       <div className = "header1" >Welcome back {name}. </div>
     <div className = "groupBalance" style={{ fontSize: '40px' }}>
-      <p>{groupName}'s Trip Receipt</p>
+      <p>{currGroupName}'s Trip Receipt</p>
       
     
   <div className = "DataTitle">Recent Group Payments</div>
