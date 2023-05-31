@@ -246,10 +246,10 @@ function Dboard() {
   </div>
   <div className="pictureButton">
 
-    <div className="scanReceipt">
-        <p>Scan a receipt</p>
-        <MdOutlineDocumentScanner size={48}/>
-      </div>
+  <Link to="/receipt" className="scanReceipt">
+      <p>Scan a receipt</p>
+      <MdOutlineDocumentScanner size={48} />
+    </Link>
 
     <div className="inputManual">
       <p>Manual Input</p>
