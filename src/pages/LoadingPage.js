@@ -9,6 +9,7 @@ import { useHistory } from 'react-router-dom';
 export default function LoadingPage(){
    const navigate = useNavigate();
    const inGroup = false; //need to somehow implemenet this, not sure how to do check for in-group or not
+   
    useEffect(() => {
     if (inGroup) {
       navigate('/dashboard');

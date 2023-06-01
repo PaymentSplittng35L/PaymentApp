@@ -3,7 +3,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { Link, useNavigate } from "react-router-dom";
 import "./Dboard.css";
 import { auth, db, logout } from "./firebase";
-import { query, collection, getDocs, where } from "firebase/firestore";
+import { query, collection, getDocs, where, addDoc } from "firebase/firestore";
 import { Line } from "react-chartjs-2";
 import {MdOutlineDocumentScanner} from 'react-icons/md'
 import {ImListNumbered} from 'react-icons/im'
@@ -22,6 +22,30 @@ function Dboard() {
   const currGroupName = location.state && location.state.currGroupName;
   console.log("The current group name is " + currGroupName);
 
+  const [eventArray, setEventArray] = useState([]);
+  const [eventInfo, setEventInfo] = useState([])
+  const [eventFound, setEventFound] = useState(false);
+
+  const addDocument = async (Date,Place,amountPaid,groupName,mealName,namePaid) => {
+    const dataToBeFed = {Date,Place,amountPaid,groupName,mealName,namePaid};
+
+    try {
+      const docRef = await addDoc(collection(db, "Event"), dataToBeFed);
+      setEventFound(false);
+    } catch (err) {
+      console.error("Error adding document: ", err);
+    }
+  };
+
+  const addToEventInfo = (place,payer,amountPaid,date) => {
+    const newEventInformation = {place,payer,amountPaid,date};
+    setEventInfo([...eventInfo,newEventInformation]);
+  };
+
+  const addToEventArray = (element) => {
+    setEventArray([...eventArray,element]);
+  };
+
   const fetchUserName = async () => {
     try {
       const q = query(collection(db, "users"), where("uid", "==", user?.uid));
@@ -32,79 +56,52 @@ function Dboard() {
       //console.log(name);
     } catch (err) {
       console.error(err);
-      //alert("An error occured while fetching user data");
+      alert("An error occured while fetching user data");
+    }
+  };
+
+  const getSomeGroup = async (paramGroup) => {
+    try {
+      const quer = query(collection(db, "Groups"), where("name", "==", paramGroup));
+      const docs = await getDocs(quer);
+      const data = docs.docs[0].data();
+      setGroupName(data.name);
+      setEventArray(data.Events);
+  
+      const eq = query(collection(db, "Event"), where("groupName", "==", groupName));
+      const eventDoc = await getDocs(eq);
+      
+      if(!eventDoc.empty){
+        setEventFound(true);
+      }
+      const eventDatabase = [];
+      eventDoc.forEach((document) => {
+        const place = document.data().Place;
+        const payer = document.data().namePaid[0];
+        const amountPaid = document.data().amountPaid;
+        const date = document.data().Date;
+        const newEventInformation = {place, payer, amountPaid,date};
+
+        eventDatabase.push(newEventInformation);
+      });
+      setEventInfo(eventDatabase);
+      // console.log(eventInfo[0].date); // Access the updated state
+      // console.log(eventInfo[1].date); // Access the updated state
+
+    } catch (err) {
+      console.error(err);
+      alert("You are not affiliated with a group!!");
     }
   };
 
   const pastPayments = {
-    payments: [
-      {
-        date: "4/12",
-        place: "Mcdonalds",
-        amount: "12.94",
-        payer: "George",
-        groupPeople: "Bob, Martha, George"
-      },
-  
-      {
-        date: "3/19",
-        place: "Dominos",
-        amount: "17.24",
-        payer: "Martha",
-        groupPeople: "Bob, Martha"
-      },
-      {
-        date: "9/10",
-        place: "Rubios",
-        amount: "9.93",
-        payer: "George",
-        groupPeople: "George"
-      },
-      {
-        date: "4/12",
-        place: "Mcdonalds",
-        amount: "12.94",
-        payer: "George",
-        groupPeople: "Bob, Martha, George"
-      },
-  
-      {
-        date: "3/19",
-        place: "Dominos",
-        amount: "17.24",
-        payer: "Martha",
-        groupPeople: "Bob, Martha"
-      },
-      {
-        date: "9/10",
-        place: "Rubios",
-        amount: "9.93",
-        payer: "George",
-        groupPeople: "George"
-      },
-      {
-        date: "4/12",
-        place: "Mcdonalds",
-        amount: "12.94",
-        payer: "George",
-        groupPeople: "Bob, Martha, George"
-      },
-  
-      {
-        date: "3/19",
-        place: "Dominos",
-        amount: "17.24",
-        payer: "Martha",
-        groupPeople: "Bob, Martha"
-      },
-      {
-        date: "9/10",
-        place: "Rubios",
-        amount: "9.93",
-        payer: "George",
-        groupPeople: "George"
-      },
-      ],
+    payments: eventInfo.map((event) => ({
+      date: event.date,
+      place: event.place,
+      amount: event.amountPaid,
+      payer: event.payer,
+      groupPeople: event.groupPeople,
+    })),
       userPayments: [
         {
           date: "4/5",
@@ -137,34 +134,17 @@ function Dboard() {
       
   }
 
-  const getSomeGroup = async () => {
-    try{
-      const quer = query(collection(db,"Groups"),where("users", "array-contains", name));
-      const docs = await getDocs(quer);
-      const data = docs.docs[0].data();
-      setGroupName(data.name);
-      setPaidOffStatus(data.paidOff);
-      setBalance(data.Balance);
-      //console.log(data.paidOff);
-
-    }
-    catch(err){
-      console.error(err);
-      //alert("You are not affiliated with a group!!");
-    }
-
-
-  };
 
   useEffect(() => {
     if (loading) return;
     if (!user) return navigate("/");
     fetchUserName();
-    getSomeGroup();
-    console.log("Your username is " + name);
+    if(!eventFound){
+      getSomeGroup(currGroupName);
+    }
+      console.log("Your username is " + name);
     console.log("Your groupname is ", groupName);
-    console.log("Your group balance is " + balance);
-    console.log("Status on being paid off: " + paidOffStatus);
+
   }, [user, loading, navigate, fetchUserName]);
 
 
@@ -176,7 +156,7 @@ function Dboard() {
          
           <div className="Dboard_nav_buttons">
             <button className="Dboard__btn"><Link to="/GroupSelection">Manage Groups</Link></button>
-            <button className="Dboard__btn">My Payments</button>
+            <button className="Dboard__btn" onClick={() => addDocument("6/2","BJs",81,"testgroup","breakfast",["sanjay"])}>My Payments</button>
             <div class="dropdown">
               <div className = "centered-text">
                 <button class="Dboard__btn">{user?.email}</button>

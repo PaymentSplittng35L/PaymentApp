@@ -18,8 +18,10 @@ export default function GroupSelection(){
   const [balance,setBalance] = useState(0);
   const [groupName, setGroupName] = useState("");
   const [paidOffStatus, setPaidOffStatus] = useState(true);
+  const [gotGroups, setgotGroups] = useState(false);
+
   const navigate = useNavigate();
-    {/*
+
   const fetchUserName = async () => {
     try {
       const q = query(collection(db, "users"), where("uid", "==", user?.uid));
@@ -36,11 +38,18 @@ export default function GroupSelection(){
 
   const getGroupsForUser = async (name) => {
     try{
+        console.log("Called function");
       const quer = query(collection(db,"Groups"),where("users", "array-contains", name));
       const querySnapshot = await getDocs(quer);
-
+      if(querySnapshot.empty == false){
+        setgotGroups(true);
+      }
+      else{
+        setgotGroups(false);
+      }
       const groupList = querySnapshot.docs.map((doc) => {
         const groupData = doc.data();
+        console.log(groupData.name);
         return {
             id: doc.id,
             name: groupData.name,
@@ -66,12 +75,15 @@ export default function GroupSelection(){
         if (!user) return navigate("/");
         console.log("Hello");
         fetchUserName();
-        const finalGroupList = await getGroupsForUser(name);
-        const groupNames = finalGroupList.map((group) => group.name);
-        setGroupNames(groupNames);
-        console.log("Group names is" + groupNames);
-        console.log("Set of groups " + finalGroupList);
-        console.log("Your username is " + name);
+        if(!gotGroups){
+            const finalGroupList = await getGroupsForUser(name);
+            const groupNames = finalGroupList.map((group) => group.name);
+            setGroupNames(groupNames);
+            console.log("Group names is" + groupNames);
+            console.log("Set of groups " + finalGroupList);
+            console.log("Your username is " + name);
+        }
+
     };
 
     getData();
@@ -81,8 +93,8 @@ export default function GroupSelection(){
     //console.log("Status on being paid off: " + paidOffStatus);
   }, [user, loading, navigate, fetchUserName]);
 
-  const [groupNames, setGroupNames] = useState();
-*/}
+  const [groupNames, setGroupNames] = useState([]);
+
   const groupNameArr = ["testGrouerh", "anotherTest", "aThirdTest", "anotherTest", "anotherTest", "aThirdTest" ];
   const colorChoices = ["#b5ecf7", "#f0dda1", "#bddebd", "#d9ccf0",  "#f7b0ad", "#b2f2a2"]
   return (
@@ -116,7 +128,7 @@ export default function GroupSelection(){
             
             </div>
 
-            {groupNameArr.map((groupName, index) => (
+            {groupNames.map((groupName, index) => (
                 <div key = {index} className="square" style={{backgroundColor: colorChoices[index % colorChoices.length]}}>
                     <div className="square-text">
                         {groupName}
