@@ -1,0 +1,28 @@
+/* button.css */
+
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .button:hover {
+    background-color: #45a049;
+  }
+  
+  .button:active {
+    background-color: #3e8e41;
+  }
+  
+  .button:focus {
+    outline: none;
+  }
+  

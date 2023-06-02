@@ -1,0 +1,77 @@
+.grid {
+    display: grid;
+    
+    grid-template-columns: repeat(4, 1fr);
+    gap: 50px;
+}
+
+.grid-container{
+    position: absolute;
+    right: 280px;
+    top: 100px;
+}
+
+.square {
+    z-index: 2;
+    align-items: center;
+    padding: 10px;
+    background-color: #d9b515;
+    object-fit: contain;
+    width: 300px;
+    height: 300px;
+
+    font-size: 18px;
+    border-style: double;
+    border-width: 10px;
+    border-radius: 20px;
+    background-color:rgb(245, 241, 241);
+    border-top-color: #1658db;
+    border-bottom-color: #1658db;
+    border-left-color: rgb(11, 148, 190);
+    border-right-color: rgb(11, 148, 190);
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 34px;
+    text-align: center;
+    vertical-align: center;
+    box-shadow: 6px 6px 5px 1px rgb(6, 28, 79);
+    
+    
+}
+
+.square-text{
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    word-wrap: break-word;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    position: relative;
+    top: 24px;
+}
+
+.square-contain{
+    display: flex;
+    align-items: vertical;
+    position: relative;
+    top: 105px;
+}
+.subSquare {
+    position: relative;
+    left: 20px;
+    cursor: pointer;
+
+}
+
+.subSquare2 {
+    position: relative;
+    
+    left: 100px;
+    cursor: pointer;
+}
+
+.plusSymbol{
+    cursor: pointer;
+    position: relative;
+    top: 17px;
+}
+
