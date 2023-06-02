@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[1]:
 
 
 import cv2
@@ -9,11 +9,11 @@ from matplotlib import pyplot as plt
 import numpy as np
 from PIL import Image
 
-image_file = "data/receipt1.jpg"
+image_file = "data/receipt5.jpg"
 img = cv2.imread(image_file)
 
 
-# In[3]:
+# In[2]:
 
 
 #basic function to display picture (for notebook)
@@ -40,13 +40,13 @@ def display(im_path):
     plt.show()
 
 
-# In[4]:
+# In[3]:
 
 
 display(image_file)
 
 
-# In[5]:
+# In[4]:
 
 
 #invert image
@@ -55,13 +55,13 @@ cv2.imwrite("temp/inverted.jpg", inverted_image)
 display("temp/inverted.jpg")
 
 
-# In[6]:
+# In[5]:
 
 
 #rescaling (dk if necessary) <-- look at tesseract documentation
 
 
-# In[7]:
+# In[6]:
 
 
 #grayscale (needed to binarize)
@@ -70,17 +70,17 @@ cv2.imwrite("temp/gray.jpg", gray_scale)
 display("temp/gray.jpg")
 
 
-# In[8]:
+# In[7]:
 
 
 #binarization (TODO: look into adaptive thresholding)
 #https://opencv24-python-tutorials.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_thresholding/py_thresholding.html#thresholding
-thresh, im_bw = cv2.threshold(gray_scale, 170, 255, cv2.THRESH_BINARY)
+thresh, im_bw = cv2.threshold(gray_scale, 160, 255, cv2.THRESH_BINARY)
 cv2.imwrite("temp/bw_image.jpg", im_bw)
 display("temp/bw_image.jpg")
 
 
-# In[9]:
+# In[8]:
 
 
 #noise removal (this is shitty right now for some reason)
@@ -100,45 +100,45 @@ cv2.imwrite("temp/no_noise.jpg", no_noise)
 display("temp/no_noise.jpg")
 
 #delete this later
-# no_noise = im_bw
+no_noise = im_bw
 
 
-# In[10]:
+# In[9]:
 
 
 #dilation and erosion
 def thin_font(image):
     image = cv2.bitwise_not(image)
-    kernel = np.ones((1,1), np.uint8)
+    kernel = np.ones((2,1), np.uint8)
     image = cv2.erode(image, kernel, iterations=1)
     image = cv2.bitwise_not(image)
     return(image)
     
-eroded_image = thin_font(im_bw)   #change to no_noise later
+eroded_image = thin_font(no_noise)   #change to no_noise later
 cv2.imwrite("temp/eroded.jpg", eroded_image)
 display("temp/eroded.jpg")
+
+
+# In[10]:
+
+
+def thick_font(image):
+    image = cv2.bitwise_not(image)
+    kernel = np.ones((2,1), np.uint8)
+    image = cv2.dilate(image, kernel, iterations=2)
+    image = cv2.bitwise_not(image)
+    return(image)
+    
+dilated_image = thick_font(eroded_image)   #change to no_noise later
+cv2.imwrite("temp/dilated.jpg", dilated_image)
+display("temp/dilated.jpg")
 
 
 # In[11]:
 
 
-def thick_font(image):
-    image = cv2.bitwise_not(image)
-    kernel = np.ones((1,1), np.uint8)
-    image = cv2.dilate(image, kernel, iterations=1)
-    image = cv2.bitwise_not(image)
-    return(image)
-    
-dilated_image = thick_font(im_bw)   #change to no_noise later
-cv2.imwrite("temp/dilated.jpg", dilated_image)
-display("temp/dilated.jpg")
-
-
-# In[12]:
-
-
 #rotation/deskewing
-rotated = cv2.imread("data/skewed.jpg")
+rotated = cv2.imread("temp/dilated.jpg")
 
 #https://becominghuman.ai/how-to-automatically-deskew-straighten-a-text-image-using-opencv-a0c30aed83df
 def getSkewAngle(cvImage) -> float:
@@ -191,7 +191,7 @@ cv2.imwrite("temp/rotated_fixed.jpg", fixed)
 display("temp/rotated_fixed.jpg")
 
 
-# In[19]:
+# In[12]:
 
 
 #get rid of border
@@ -208,7 +208,7 @@ cv2.imwrite("temp/no_borders.jpg", no_borders)
 display("temp/no_borders.jpg")
 
 
-# In[24]:
+# In[13]:
 
 
 color = [255,255,255]
@@ -216,6 +216,18 @@ top,bottom,left,right = [10]*4
 add_borders = cv2.copyMakeBorder(no_borders, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)
 cv2.imwrite("temp/image_with_border.jpg", add_borders)
 display("temp/image_with_border.jpg")
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
 
 
 # In[ ]:
