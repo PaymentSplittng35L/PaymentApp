@@ -8,6 +8,7 @@ import { Line } from "react-chartjs-2";
 import {MdOutlineDocumentScanner} from 'react-icons/md'
 import {ImListNumbered} from 'react-icons/im'
 import { useLocation} from 'react-router-dom';
+import {Node,Graph} from './Graph.js'
 
 
 function Dboard() {
@@ -15,7 +16,7 @@ function Dboard() {
   const [name, setName] = useState("");
   const [balance,setBalance] = useState(0);
   const [groupName, setGroupName] = useState("");
-  const [paidOffStatus, setPaidOffStatus] = useState(true);
+  const [groupUsers, setGroupUsers] = useState([]);
   const navigate = useNavigate();
 
   const location = useLocation();
@@ -42,6 +43,21 @@ function Dboard() {
     setEventInfo([...eventInfo,newEventInformation]);
   };
 
+  //TRYING IT OUT
+  //HERE DUDE
+  //const test = new Node('MyFirstNode');
+  //test.addEdge("Joe", 10);
+  //test.addEdge("Joe", 15);
+  //test.addEdge("Joe", 3);
+  //test.printEdges();
+  //test.printEdges();
+  //console.log("\n");
+  //test.removeParallelEdges();
+  //test.printEdges();
+
+
+
+
   const addToEventArray = (element) => {
     setEventArray([...eventArray,element]);
   };
@@ -67,7 +83,7 @@ function Dboard() {
       const data = docs.docs[0].data();
       setGroupName(data.name);
       setEventArray(data.Events);
-  
+      setGroupUsers(data.users);
       const eq = query(collection(db, "Event"), where("groupName", "==", groupName));
       const eventDoc = await getDocs(eq);
       
@@ -93,6 +109,19 @@ function Dboard() {
       alert("You are not affiliated with a group!!");
     }
   };
+
+  //This is where we are working
+  const names = groupUsers;
+  const dummy = new Graph(groupName,names);
+  function getDebtors(allNames,payerName){
+    return allNames.filter(item => item !== payerName);
+  }
+  eventInfo.forEach(ev =>{
+    const debts = getDebtors(names,ev.payer);
+    dummy.groupPurchase(ev.payer, debts, ev.amountPaid);
+  });
+  dummy.Opium();
+  dummy.printNodesAndEdges();
 
   const pastPayments = {
     payments: eventInfo.map((event) => ({
