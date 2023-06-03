@@ -9,6 +9,7 @@ import {MdOutlineDocumentScanner} from 'react-icons/md'
 import {ImListNumbered} from 'react-icons/im'
 import { useLocation} from 'react-router-dom';
 import {Node,Graph} from './Graph.js'
+import { OptimizeCosts } from './GreedyAlgorithm.js'
 
 
 function Dboard() {
@@ -26,6 +27,8 @@ function Dboard() {
   const [eventArray, setEventArray] = useState([]);
   const [eventInfo, setEventInfo] = useState([])
   const [eventFound, setEventFound] = useState(false);
+  const [graphObjectMake, setGraphObjectMake] = useState(true);
+
 
   const addDocument = async (Date,Place,amountPaid,groupName,mealName,namePaid) => {
     const dataToBeFed = {Date,Place,amountPaid,groupName,mealName,namePaid};
@@ -111,18 +114,27 @@ function Dboard() {
   };
 
   //This is where we are working
-  const names = groupUsers;
-  const dummy = new Graph(groupName,names);
-  function getDebtors(allNames,payerName){
-    return allNames.filter(item => item !== payerName);
-  }
-  eventInfo.forEach(ev =>{
-    const debts = getDebtors(names,ev.payer);
-    dummy.groupPurchase(ev.payer, debts, ev.amountPaid);
-  });
-  dummy.Opium();
-  dummy.printNodesAndEdges();
+  const graphStuff = async () => {
+    const names = groupUsers;
+    const dummy = new Graph(groupName,names);
 
+    function getDebtors(allNames,payerName){
+      return allNames.filter(item => item !== payerName);
+    }
+    eventInfo.forEach(ev =>{
+      const debts = getDebtors(names,ev.payer);
+      dummy.groupPurchase(ev.payer, debts, ev.amountPaid);
+    });
+    //dummy.Optimize();
+    dummy.printNodesAndEdges();
+    const optum = new OptimizeCosts(dummy);
+    optum.calculate();
+    const finalGraph = optum.getGraph();
+    finalGraph.caseA();
+    finalGraph.printNodesAndEdges();
+    //const retGraph = optum.getGraph();
+    //retGraph.printNodesAndEdges();
+}
   const pastPayments = {
     payments: eventInfo.map((event) => ({
       date: event.date,
@@ -170,6 +182,11 @@ function Dboard() {
     fetchUserName();
     if(!eventFound){
       getSomeGroup(currGroupName);
+    }
+    if(eventFound && graphObjectMake){
+      graphStuff();
+      setGraphObjectMake(false);
+
     }
       console.log("Your username is " + name);
     console.log("Your groupname is ", groupName);
