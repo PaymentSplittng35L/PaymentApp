@@ -9,7 +9,6 @@ import { useHistory } from 'react-router-dom';
 import {AiOutlinePlusCircle} from 'react-icons/ai';
 import {CgEnter} from 'react-icons/cg';
 import {FiSettings} from 'react-icons/fi';
-import currentGroupVar from './currentGroupVar';
 
 export default function GroupSelection(){
 

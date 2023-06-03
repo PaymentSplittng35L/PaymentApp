@@ -8,7 +8,9 @@ import { Line } from "react-chartjs-2";
 import {MdOutlineDocumentScanner} from 'react-icons/md'
 import {ImListNumbered} from 'react-icons/im'
 import { useLocation} from 'react-router-dom';
-
+import {AiOutlineCloseCircle} from 'react-icons/ai';
+import Modal from 'react-modal';
+import Select from 'react-select';
 
 function Dboard() {
   const [user, loading] = useAuthState(auth);
@@ -16,7 +18,10 @@ function Dboard() {
   const [balance,setBalance] = useState(0);
   const [groupName, setGroupName] = useState("");
   const [paidOffStatus, setPaidOffStatus] = useState(true);
+  const [closing, setClosing] = useState(false);
   const navigate = useNavigate();
+  const [formValid, setFormValid] = useState(false);
+  const [groupUsers, setGroupUsers] = useState([]);
 
   const location = useLocation();
   const currGroupName = location.state && location.state.currGroupName;
@@ -25,6 +30,47 @@ function Dboard() {
   const [eventArray, setEventArray] = useState([]);
   const [eventInfo, setEventInfo] = useState([])
   const [eventFound, setEventFound] = useState(false);
+
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [formatUsers, setFormatUsers] = useState([]);
+
+  const options=["Bob", "Martha", "George", "David"];
+
+  
+const allUsers = groupUsers.map(name => {
+  return {
+    value: name.toLowerCase(),
+    label: name
+  };
+});
+
+
+  const current = new Date();
+  const month = (current.getMonth()+1).toString();
+  const day = (current.getDate()).toString();
+  const currDate = month + '/' + day;
+  const [paymentValues, setPaymentValues] = useState({
+    totalPrice: '',
+    personPaid: '',
+    place: '',
+    date: currDate,
+    description: '',
+    // Add more fields as needed
+  });
+
+  const validateForm = () => {
+    const { totalPrice, personPaid, place, date, description} = paymentValues;
+  
+    // Check if any required field is empty
+    if (!totalPrice || !selectedUsers || !date || !place || !personPaid) {
+      return false;
+
+    }
+  
+    return true;
+  };
 
   const addDocument = async (Date,Place,amountPaid,groupName,mealName,namePaid) => {
     const dataToBeFed = {Date,Place,amountPaid,groupName,mealName,namePaid};
@@ -36,6 +82,68 @@ function Dboard() {
       console.error("Error adding document: ", err);
     }
   };
+
+  const openModal = () => {
+    setModalIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setPaymentValues((prevValues) => ({
+      ...prevValues,
+      [name]: value,
+    }));
+  };
+
+  const handleSelect = (selectedItems) => {
+    setSelectedUsers(selectedItems);
+  }
+
+
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if(modalIsOpen && !closing){
+      if (!validateForm()) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+
+    // Call your function here with paymentValues
+    console.log("About to process these values");
+    console.log("Selected users are", selectedUsers); //can access group of everyone who paid
+    const selectedUsersName = selectedUsers.map((user) => user.label); //can do user.value to get unique UID for each person, etc.
+    addDocument(paymentValues.date,paymentValues.place,paymentValues.totalPrice,currGroupName,paymentValues.description,[paymentValues.personPaid]);
+    console.log("JUST ADDED TO DOC SOMEHOW");
+    closeModal();
+    }
+    else{
+      closeModal();
+      setClosing(false);
+    }
+  };
+
+  const handleSelectAll = () => {
+    setSelectedUsers(allUsers);
+  }
+
+  const handleDeselectAll = () => {
+    setSelectedUsers([]);
+  }
+
+  const handleClose = (e) => {
+    setClosing(true);
+    closeModal();
+    console.log("Tried to close");
+    
+  }
+
+
+
 
   const addToEventInfo = (place,payer,amountPaid,date) => {
     const newEventInformation = {place,payer,amountPaid,date};
@@ -74,6 +182,8 @@ function Dboard() {
       if(!eventDoc.empty){
         setEventFound(true);
       }
+
+      setGroupUsers(data.users);
       const eventDatabase = [];
       eventDoc.forEach((document) => {
         const place = document.data().Place;
@@ -237,7 +347,143 @@ function Dboard() {
         <MdOutlineDocumentScanner size={48}/>
       </div>
 
-    <div className="inputManual">
+    <div className="inputManual" onClick={openModal}>
+    <Modal 
+    isOpen={modalIsOpen} 
+    onRequestClose={closeModal}
+    className="modal"
+    overlayClassName="overlay"
+    
+    >
+      
+      
+        <h2 className="modalTitle">Payment Form</h2>
+        <form className="formStyle" onSubmit={handleSubmit}>
+        <button className="closeButton" onClick={handleClose}>
+      <AiOutlineCloseCircle size={48}/>
+      </button>
+          <p className="subtitle">Price*</p>
+          <input
+            className="priceStyle"
+            type="number"
+            name="totalPrice"
+            value={paymentValues.totalPrice}
+            onChange={handleChange}
+            placeholder=""
+            //required
+          />
+   
+      
+         
+
+{/*
+          <select 
+            multiple={true}
+            value={selectedUsers} 
+            onChange={(e) => handleSelect(e.target.selectedOptions)}>
+            {users.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+            */}
+          <p className="subtitle2">Members of Group*</p>
+          <Select
+            isMulti={true}
+            value={selectedUsers}
+            options={allUsers}
+            onChange={handleSelect}
+            //required
+          
+          
+          />
+
+          <br />
+          <div className="selectButton">
+          <button type="button" className="sButton" onClick={handleSelectAll}>Select All</button>
+          <button type="button" className="sButton" onClick={handleDeselectAll}>Deselect All</button>
+          </div>
+          
+
+
+
+          <p className="subtitle2">Payer*</p>
+          <select 
+            name="personPaid"
+            value={paymentValues.personPaid} 
+            className="payerStyle"
+            onChange={handleChange}
+            placeholder="Select..."
+            //required
+            >
+            {selectedUsers.map((user) => (
+              <option key={user.label} value={user.label}>{user.label}</option>
+            ))}
+
+            {/*
+            {options.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}*/}
+          </select>
+
+          <p className="subtitle2">Additional Info</p>
+          
+          <div className="extraInfo">
+
+          
+          <input
+            type="date"
+            name="date"
+            value={paymentValues.date}
+            onChange={handleChange}
+            className="smallButton"
+            pattern="^[0-9]*/[0-9]*$"
+            //required
+          /><label htmlFor="date">
+          Enter Date<span className="required-field">*</span>
+        </label>
+          <br />
+
+          <input
+            
+            type="text"
+            name="place"
+            value={paymentValues.place}
+            onChange={handleChange}
+            placeholder=""
+            className="smallButton"
+            //required
+          /><label htmlFor="date">
+          Enter Place<span className="required-field">*</span>
+        </label>
+          <br />
+
+          <input
+            type="text"
+            name="description"
+            value={paymentValues.description}
+            onChange={handleChange}
+            placeholder=""
+            className="smallButton"
+          /><label htmlFor="date">
+          Short Description<span className="required-field"></span>
+        </label>
+          </div>
+          <br />
+          {/* Add more input fields for other payment values */}
+          
+        
+
+
+
+          <button type="submit" className="submitButton">Submit</button>
+          <br />
+          <button className="closingButton" onClick={handleClose}>Close</button>
+        </form>
+      </Modal>
       <p>Manual Input</p>
       <ImListNumbered size={40}/>
 
