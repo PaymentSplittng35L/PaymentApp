@@ -26,6 +26,17 @@ class Node{
         // Return a default value or handle the case when the edge is not found
         return null; // or throw an error, depending on your requirements
       }
+
+    //basically, will look at each edge that originates at this vertex and push them to retList
+    //edge[0] is the destination and edge[1] is weight getName() is the source
+    //So basically, retList will now have every edge originating at this specific node
+    getEdges(){
+        var retList = []
+        this.myedges.forEach(edge =>{
+            retList.push([this.getName(),edge[0],edge[1]]); 
+        });
+        return retList
+    }
     delEdge(dest) {
         const index = this.myedges.findIndex(([d]) => d === dest);
         if (index !== -1) {
@@ -68,6 +79,28 @@ class Graph{
             this.nodeList.push(new Node(prop2[i]));
         }
         
+    } //ok makes sense
+    //What this does is intializes a list called allEdges, then iterates through every node in the graph
+    //And calls the getEdges method to get all edges that originate at that vertex in the form [src,dest,weight]
+    //And then takes the list of all those edges and appends each edge to the allEdges list
+    
+    getAllEdges(){
+        var allEdges = [];
+        this.nodeList.forEach(node =>{
+            var tempEdges = node.getEdges();
+            tempEdges.forEach(edge =>{
+                allEdges.push(edge);
+            });
+        });
+        return allEdges;
+    }
+    //should give us all the names of the people
+    getAllNames(){
+        var allNames = [];
+        this.nodeList.forEach(node =>{
+            allNames.push(node.getName());
+        });
+        return allNames;
     }
 
     caseA(){
@@ -101,6 +134,13 @@ class Graph{
             
         }
     }
+
+    parseOptimization(listOfLists){
+        listOfLists.forEach(edge =>{
+            var srcIndex = this.nodeList.findIndex(source => source.getName() === edge[0]);
+            this.nodeList[srcIndex].addEdge(edge[1],edge[2]);
+        });
+    }
     
     Optimize(){
         this.caseA();
@@ -109,7 +149,7 @@ class Graph{
 
 
     groupPurchase(payer, debts, total){
-        const divideTotal = total/debts.length;
+        const divideTotal = total/(debts.length+1);
         var debtList = []
         this.nodeList.forEach(node =>{
             if(debts.includes(node.getName())){
