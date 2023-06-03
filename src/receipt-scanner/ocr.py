@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# coding: utf-8
+
 """
 initializes our imports
 and defines helper functions
