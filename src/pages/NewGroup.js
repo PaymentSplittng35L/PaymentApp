@@ -14,12 +14,16 @@ const NewGroup = () => {
   const [showPopup, setShowPopup] = useState(false);
 
   const [groupName, setGroupName] = useState('');
+  const [joinGroupName, setGroupName2] = useState('')
   const [user, loading] = useAuthState(auth);
+  const [arr, setArr] = useState('');
 
   const handleGroupNameChange = (event) => {
     setGroupName(event.target.value);
   };
-
+  const handleGroupNameChange2 = (event) => {
+    setGroupName2(event.target.value);
+  };
 
  
 
@@ -36,21 +40,25 @@ const NewGroup = () => {
     setGroupName('');
   };
 
-  const joinGroupSubmit= async (event) => {
+  const joinGroupSubmit = async (event) => {
     event.preventDefault();
-    //take the groupName and query a group to see if it exists. If it does take the array, push the new id, then upload that to firebase
-    const q = query(collection(db, "Groups"), where("name", "==", groupName));
-    const doc = await getDocs(q);
-    
-    const data = doc.docs[3].data(); //double check that this gets the array of names
-    let arr = data.push(user.uid);
-    //let arr = [];
-    await setDoc(collection(db, "Groups"), {
-        users: arr
-      },{ merge: true });
-
-    setGroupName('');
+  
+    const q = collection(db, "Groups");
+    const querySnapshot = await getDocs(query(q, where("name", "==", joinGroupName)));
+  
+    if (!querySnapshot.empty) {
+      const doc = querySnapshot.docs[0];
+      const data = doc.data();
+      const usersArray = data.users || []; // If users array doesn't exist, initialize it as an empty array
+      const newUsers = [...usersArray, user.uid];
+  
+      await setDoc(doc.ref, { users: newUsers }, { merge: true });
+      setArr(newUsers);
+    }
+  
+    setGroupName2('');
   };
+  
 
   return (
     <>
@@ -85,8 +93,8 @@ const NewGroup = () => {
           <input
             type="text"
             id="group-name"
-            value={groupName}
-            onChange={handleGroupNameChange}
+            value={joinGroupName}
+            onChange={handleGroupNameChange2}
           />
         </div>
         <button type="submit">Join Group</button>

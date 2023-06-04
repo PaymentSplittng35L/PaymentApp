@@ -11,15 +11,18 @@
     "firebase": "^9.22.0",
     "jquery": "^3.7.0",
     "popper.js": "^1.16.1",
+    "popup": "^0.0.3",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.4",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "react-firebase-hooks": "^5.1.1",
     "react-icons": "^4.8.0",
+    "react-modal": "^3.16.1",
     "react-router-dom": "^6.11.2",
     "react-scripts": "5.0.1",
     "react-table": "^7.8.0",
+    "reactjs-popup": "^2.0.5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
