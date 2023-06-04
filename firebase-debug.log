@@ -1,0 +1,60 @@
+[debug] [2023-06-04T10:09:33.528Z] ----------------------------------------------------------------------
+[debug] [2023-06-04T10:09:33.530Z] Command:       /opt/homebrew/Cellar/node/20.0.0/bin/node /Users/srikarnimmagadda/Desktop/Coding/Projects/PaymentApp/node_modules/.bin/firebase serve
+[debug] [2023-06-04T10:09:33.530Z] CLI Version:   12.3.0
+[debug] [2023-06-04T10:09:33.530Z] Platform:      darwin
+[debug] [2023-06-04T10:09:33.530Z] Node Version:  v20.0.0
+[debug] [2023-06-04T10:09:33.530Z] Time:          Sun Jun 04 2023 03:09:33 GMT-0700 (Pacific Daylight Time)
+[debug] [2023-06-04T10:09:33.530Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-06-04T10:09:33.575Z] Object ".hosting.rewrites[0]" in "firebase.json" has unknown property: {"additionalProperty":"source"}
+[debug] [2023-06-04T10:09:33.575Z] Object ".hosting.rewrites[0]" in "firebase.json" has unknown property: {"additionalProperty":"source"}
+[debug] [2023-06-04T10:09:33.575Z] Object ".hosting.rewrites[0]" in "firebase.json" has unknown property: {"additionalProperty":"source"}
+[debug] [2023-06-04T10:09:33.575Z] Object ".hosting.rewrites[0]" in "firebase.json" has unknown property: {"additionalProperty":"source"}
+[debug] [2023-06-04T10:09:33.575Z] Object ".hosting.rewrites[0]" in "firebase.json" has unknown property: {"additionalProperty":"source"}
+[debug] [2023-06-04T10:09:33.575Z] Object ".hosting.rewrites[0]" in "firebase.json" has unknown property: {"additionalProperty":"run"}
+[debug] [2023-06-04T10:09:33.575Z] Object ".hosting.rewrites[0]" in "firebase.json" has unknown property: {"additionalProperty":"run"}
+[debug] [2023-06-04T10:09:33.575Z] Object ".hosting.rewrites[0]" in "firebase.json" has unknown property: {"additionalProperty":"run"}
+[debug] [2023-06-04T10:09:33.575Z] Object ".hosting.rewrites[0].run" in "firebase.json" has unknown property: {"additionalProperty":"serviceID"}
+[debug] [2023-06-04T10:09:33.575Z] Object ".hosting.rewrites[0]" in "firebase.json" has unknown property: {"additionalProperty":"run"}
+[debug] [2023-06-04T10:09:33.575Z] Object ".hosting.rewrites[0]" in "firebase.json" has unknown property: {"additionalProperty":"source"}
+[debug] [2023-06-04T10:09:33.575Z] Object ".hosting.rewrites[0]" in "firebase.json" has unknown property: {"additionalProperty":"source"}
+[debug] [2023-06-04T10:09:33.575Z] Object ".hosting.rewrites[0]" in "firebase.json" has unknown property: {"additionalProperty":"source"}
+[debug] [2023-06-04T10:09:33.575Z] Object ".hosting.rewrites[0]" in "firebase.json" has unknown property: {"additionalProperty":"source"}
+[debug] [2023-06-04T10:09:33.575Z] Object ".hosting.rewrites[0]" in "firebase.json" has unknown property: {"additionalProperty":"source"}
+[debug] [2023-06-04T10:09:33.575Z] Field ".hosting.rewrites[0]" in "firebase.json" is possibly invalid: should match some schema in anyOf
+[debug] [2023-06-04T10:09:33.575Z] Field ".hosting" in "firebase.json" is possibly invalid: should be array
+[debug] [2023-06-04T10:09:33.575Z] Field ".hosting" in "firebase.json" is possibly invalid: should match some schema in anyOf
+[debug] [2023-06-04T10:09:33.577Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-06-04T10:09:33.578Z] > authorizing via signed-in user (srikarnimma18@g.ucla.edu)
+[debug] [2023-06-04T10:09:33.578Z] [iam] checking project test-966dc for permissions ["firebase.projects.get"]
+[debug] [2023-06-04T10:09:33.578Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/test-966dc:testIamPermissions [none]
+[debug] [2023-06-04T10:09:33.578Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/test-966dc:testIamPermissions x-goog-quota-user=projects/test-966dc
+[debug] [2023-06-04T10:09:33.578Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/test-966dc:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2023-06-04T10:09:33.798Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/test-966dc:testIamPermissions 200
+[debug] [2023-06-04T10:09:33.798Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/test-966dc:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2023-06-04T10:09:33.798Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/test-966dc [none]
+[debug] [2023-06-04T10:09:34.077Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/test-966dc 200
+[debug] [2023-06-04T10:09:34.077Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/test-966dc {"projectId":"test-966dc","projectNumber":"155507898533","displayName":"test","name":"projects/test-966dc","resources":{"hostingSite":"test-966dc"},"state":"ACTIVE","etag":"1_da117716-559b-4556-9403-f492d096787d"}
+[info] 
+[info] === Serving from '/Users/srikarnimmagadda/Desktop/Coding/Projects/PaymentApp'...
+[info] 
+[debug] [2023-06-04T10:09:34.079Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/test-966dc/sites 
+[debug] [2023-06-04T10:09:34.537Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/test-966dc/sites 200
+[debug] [2023-06-04T10:09:34.537Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/test-966dc/sites {"sites":[{"name":"projects/test-966dc/sites/test-966dc","defaultUrl":"https://test-966dc.web.app","type":"DEFAULT_SITE"}]}
+[debug] [2023-06-04T10:09:34.538Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/test-966dc/webApps/-/config [none]
+[debug] [2023-06-04T10:09:34.975Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/test-966dc/webApps/-/config 200
+[debug] [2023-06-04T10:09:34.975Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/test-966dc/webApps/-/config {"projectId":"test-966dc","appId":"1:155507898533:web:0d9a9e43bcf8677c32f54c","storageBucket":"test-966dc.appspot.com","apiKey":"AIzaSyC_xdgN2q3UQm70g_tRi2ILynikrkCuhZg","authDomain":"test-966dc.firebaseapp.com","messagingSenderId":"155507898533","measurementId":"G-PMSV26DM4S"}
+[debug] [2023-06-04T10:09:34.981Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/test-966dc [none]
+[debug] [2023-06-04T10:09:35.241Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/test-966dc 200
+[debug] [2023-06-04T10:09:35.241Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/test-966dc {"projectId":"test-966dc","projectNumber":"155507898533","displayName":"test","name":"projects/test-966dc","resources":{"hostingSite":"test-966dc"},"state":"ACTIVE","etag":"1_da117716-559b-4556-9403-f492d096787d"}
+[debug] [2023-06-04T10:09:35.241Z] Specified "public" directory "static" does not exist; Deploy to Hosting site "test-966dc" may fail or be empty.
+[info] i  hosting[test-966dc]: Serving hosting files from: static {"metadata":{"emulator":{"name":"hosting"},"message":"Serving hosting files from: \u001b[1mstatic\u001b[22m"}}
+[info] ✔  hosting[test-966dc]: Local server: http://localhost:5002 {"metadata":{"emulator":{"name":"hosting"},"message":"Local server: \u001b[4m\u001b[1mhttp://localhost:5002\u001b[22m\u001b[24m"}}
+[error] A problem occurred while trying to handle a proxied rewrite: Cloud Run rewrites must supply a service ID.
+[info] i  hosting: ::1 - - [04/Jun/2023:10:09:46 +0000] "GET / HTTP/1.1" 500 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6.1 Safari/605.1.15" {"metadata":{"emulator":{"name":"hosting"},"message":"::1 - - [04/Jun/2023:10:09:46 +0000] \"GET / HTTP/1.1\" 500 - \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6.1 Safari/605.1.15\""}}
+[error] A problem occurred while trying to handle a proxied rewrite: Cloud Run rewrites must supply a service ID.
+[info] i  hosting: ::1 - - [04/Jun/2023:10:09:46 +0000] "GET /favicon.ico HTTP/1.1" 500 - "http://localhost:5002/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6.1 Safari/605.1.15" {"metadata":{"emulator":{"name":"hosting"},"message":"::1 - - [04/Jun/2023:10:09:46 +0000] \"GET /favicon.ico HTTP/1.1\" 500 - \"http://localhost:5002/\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6.1 Safari/605.1.15\""}}
+[error] A problem occurred while trying to handle a proxied rewrite: Cloud Run rewrites must supply a service ID.
+[info] i  hosting: ::1 - - [04/Jun/2023:10:29:43 +0000] "GET / HTTP/1.1" 500 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36" {"metadata":{"emulator":{"name":"hosting"},"message":"::1 - - [04/Jun/2023:10:29:43 +0000] \"GET / HTTP/1.1\" 500 - \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36\""}}
+[error] A problem occurred while trying to handle a proxied rewrite: Cloud Run rewrites must supply a service ID.
+[info] i  hosting: ::1 - - [04/Jun/2023:10:29:43 +0000] "GET /favicon.ico HTTP/1.1" 500 - "http://localhost:5002/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36" {"metadata":{"emulator":{"name":"hosting"},"message":"::1 - - [04/Jun/2023:10:29:43 +0000] \"GET /favicon.ico HTTP/1.1\" 500 - \"http://localhost:5002/\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36\""}}
