@@ -20,17 +20,25 @@ import {
     where,
     addDoc,
 } from "firebase/firestore";
-
-
 const firebaseConfig = {
-    apiKey: "AIzaSyC_xdgN2q3UQm70g_tRi2ILynikrkCuhZg",
-    authDomain: "test-966dc.firebaseapp.com",
-    projectId: "test-966dc",
-    storageBucket: "test-966dc.appspot.com",
-    messagingSenderId: "155507898533",
-    appId: "1:155507898533:web:0d9a9e43bcf8677c32f54c",
-    measurementId: "G-PMSV26DM4S"
-  };
+  apiKey: "AIzaSyBg0Tbdrf9a73P1_66An2GY_ZZZmhTQ0OI",
+  authDomain: "myproject2-64909.firebaseapp.com",
+  projectId: "myproject2-64909",
+  storageBucket: "myproject2-64909.appspot.com",
+  messagingSenderId: "1036775344211",
+  appId: "1:1036775344211:web:7dbcf9191ea5fc760d1ea6",
+  measurementId: "G-0ZPMBEJ23B"
+};
+
+// const firebaseConfig = {
+//     apiKey: "AIzaSyC_xdgN2q3UQm70g_tRi2ILynikrkCuhZg",
+//     authDomain: "test-966dc.firebaseapp.com",
+//     projectId: "test-966dc",
+//     storageBucket: "test-966dc.appspot.com",
+//     messagingSenderId: "155507898533",
+//     appId: "1:155507898533:web:0d9a9e43bcf8677c32f54c",
+//     measurementId: "G-PMSV26DM4S"
+//   };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

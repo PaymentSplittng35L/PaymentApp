@@ -8,33 +8,245 @@ import { Line } from "react-chartjs-2";
 import {MdOutlineDocumentScanner} from 'react-icons/md'
 import {ImListNumbered} from 'react-icons/im'
 import { useLocation} from 'react-router-dom';
-
+import {Node,Graph} from './Graph.js'
+import { OptimizeCosts } from './GreedyAlgorithm.js'
+import {AiOutlineCloseCircle} from 'react-icons/ai';
+import Modal from 'react-modal';
+import Select from 'react-select';
+import { docs, updateDoc } from 'firebase/firestore';
+import Navbar from './Navbar';
 
 function Dboard() {
   const [user, loading] = useAuthState(auth);
   const [name, setName] = useState("");
   const [balance,setBalance] = useState(0);
   const [groupName, setGroupName] = useState("");
-  const [paidOffStatus, setPaidOffStatus] = useState(true);
+  const [groupUsers, setGroupUsers] = useState([]);
+  const [finalGraphEdges, setFinalGraphEdges] = useState([]);
+  const [readyToUpload,setReadyToUpload] = useState(false);
   const navigate = useNavigate();
+  const [closing, setClosing] = useState(false);
+  const [formValid, setFormValid] = useState(false);
 
   const location = useLocation();
   const currGroupName = location.state && location.state.currGroupName;
   console.log("The current group name is " + currGroupName);
 
-  const [eventArray, setEventArray] = useState([]);
   const [eventInfo, setEventInfo] = useState([])
   const [eventFound, setEventFound] = useState(false);
+  const [emptyList, setEmptyList] = useState(false);
+  const [graphObjectMake, setGraphObjectMake] = useState(true);
 
-  const addDocument = async (Date,Place,amountPaid,groupName,mealName,namePaid) => {
-    const dataToBeFed = {Date,Place,amountPaid,groupName,mealName,namePaid};
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState([]);
+
+  const allUsers = groupUsers.map(name => {
+    return {
+      value: name.toLowerCase(),
+      label: name
+    };
+  });
+  
+
+  const current = new Date();
+  const month = (current.getMonth()+1).toString();
+  const day = (current.getDate()).toString();
+  const currDate = month + '/' + day;
+  const [paymentValues, setPaymentValues] = useState({
+    totalPrice: '',
+    personPaid: '',
+    place: '',
+    date: currDate,
+    description: '',
+    // Add more fields as needed
+  });
+
+  const validateForm = () => {
+    const { totalPrice, personPaid, place, date, description} = paymentValues;
+  
+    // Check if any required field is empty
+    if (!totalPrice || !selectedUsers || !date || !place || !personPaid || !description) {
+      if(!totalPrice){
+        alert("totalprice not there!");
+      }
+      if(!selectedUsers){
+        alert("selected users not there!")
+      }
+     
+      if(!date){
+        alert("No description");
+      }
+      if(!place){
+        alert("No place");
+      }
+      if(!personPaid){
+        alert("No personPaid");
+      }
+      if(!description){
+        alert("No description");
+      }
+      return false;
+    }
+    if(personPaid === "select"){
+      return false;
+    }
+  
+    return true;
+  };
+
+
+  const addDocument = async (Date,Place,amountPaid,groupName,mealName,namePaid,peopleAttending) => {
+    peopleAttending = peopleAttending.filter(person => person !== namePaid[0]);
+    const dataToBeFed = {Date,Place,amountPaid,groupName,mealName,namePaid,peopleAttending};
 
     try {
+      setEmptyList(false);
+      const q = await query(collection(db, "Groups"), where("name", "==", groupName));
+      const doc = await getDocs(q);
+      const hasEvent = true;
+      const docReftwo = doc.docs[0].ref;
+      await updateDoc(docReftwo, { hasEvent });
+
       const docRef = await addDoc(collection(db, "Event"), dataToBeFed);
       setEventFound(false);
+      
     } catch (err) {
       console.error("Error adding document: ", err);
     }
+  };
+
+  const openModal = () => {
+    setModalIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setPaymentValues((prevValues) => ({
+      ...prevValues,
+      [name]: value,
+    }));
+  };
+
+  const handleSelect = (selectedItems) => {
+    setSelectedUsers(selectedItems);
+  }
+
+  const clearForm = () => {
+    if(!modalIsOpen){
+      setPaymentValues({
+        totalPrice: '',
+        place: '',
+        date: ' ',
+        description: '',
+      });
+      handleDeselectAll();
+    }
+  }
+
+  const handleOpening = () => {
+    clearForm();
+    openModal();
+  }
+
+
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if(modalIsOpen && !closing){
+      if (!validateForm()) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+
+    // Call your function here with paymentValues
+    console.log("About to process these values");
+    console.log("Selected users are", selectedUsers); //can access group of everyone who paid
+    const selectedUsersName = selectedUsers.map((user) => user.label); //can do user.value to get unique UID for each person, etc.
+    addDocument(paymentValues.date,paymentValues.place,paymentValues.totalPrice,currGroupName,paymentValues.description,[paymentValues.personPaid], selectedUsersName);
+    console.log("f TO DOC SOMEHOW");
+    closeModal();
+    }
+    else{
+      closeModal();
+      setClosing(false);
+    }
+  };
+
+  const handleSelectAll = () => {
+    setSelectedUsers(allUsers);
+  }
+
+  const handleDeselectAll = () => {
+    setSelectedUsers([]);
+  }
+
+  const handleClose = (e) => {
+    setClosing(true);
+    closeModal();
+    console.log("Tried to close");
+    
+  }
+
+
+  const getGraphFromFirebase = async() =>{
+    try{
+      
+    const q = query(collection(db, "Splitpay"), where("groupName", "==", groupName));
+    const doc = await getDocs(q);
+    if(doc.empty){
+      return false;
+    }
+    else{
+      return true;
+    }
+    const data = doc.docs[0].data();
+    const retGraph = new Graph(groupName,groupUsers);
+    const srcList = data.sources;
+    const destList = data.destinations;
+    const weightList = data.weights;
+    if(srcList.length != destList.length != weightList){
+      return false;
+    }
+    for(var i =0;i<srcList.length;i++){
+      retGraph.addAnEdge(srcList[i],destList[i],weightList[i]);
+    }
+    //return true;
+    //return retGraph;
+
+    } catch (err) {
+      return false;
+    }
+  };
+
+  const uploadEdgesToFirebase = async() =>{
+    const inputGraph = await graphStuff();
+    console.log("Input graph has ", inputGraph);
+    if(getGraphFromFirebase() === true){
+      return;
+    }
+    const edges = inputGraph;
+    const sources = [];
+    const destinations = [];
+    const weights = [];
+    const payStatus = [];
+    edges.forEach(edge =>{
+      sources.push(edge[0]);
+      destinations.push(edge[1]);
+      weights.push(edge[2]);
+      payStatus.push("Not confirmed");
+    });
+    const dataToBeFed = {groupName,sources,destinations,weights,payStatus};
+
+    try {
+      const docRef = await addDoc(collection(db, "Splitpay"), dataToBeFed);
+    } catch (err) {
+      console.error("Error adding document: ", err);
+    }
+
   };
 
   const addToEventInfo = (place,payer,amountPaid,date) => {
@@ -42,9 +254,19 @@ function Dboard() {
     setEventInfo([...eventInfo,newEventInformation]);
   };
 
-  const addToEventArray = (element) => {
-    setEventArray([...eventArray,element]);
-  };
+  //TRYING IT OUT
+  //HERE DUDE
+  //const test = new Node('MyFirstNode');
+  //test.addEdge("Joe", 10);
+  //test.addEdge("Joe", 15);
+  //test.addEdge("Joe", 3);
+  //test.printEdges();
+  //test.printEdges();
+  //console.log("\n");
+  //test.removeParallelEdges();
+  //test.printEdges();
+
+
 
   const fetchUserName = async () => {
     try {
@@ -56,37 +278,61 @@ function Dboard() {
       //console.log(name);
     } catch (err) {
       console.error(err);
-      alert("An error occured while fetching user data");
+      //alert("An error occured while fetching user data");
     }
   };
 
   const getSomeGroup = async (paramGroup) => {
     try {
-      const quer = query(collection(db, "Groups"), where("name", "==", paramGroup));
+      const quer = await query(collection(db, "Groups"), where("name", "==", paramGroup));
       const docs = await getDocs(quer);
       const data = docs.docs[0].data();
       setGroupName(data.name);
-      setEventArray(data.Events);
-  
-      const eq = query(collection(db, "Event"), where("groupName", "==", groupName));
+      setGroupUsers(data.users);
+      const eq = await query(collection(db, "Event"), where("groupName", "==", groupName));
       const eventDoc = await getDocs(eq);
       
       if(!eventDoc.empty){
         setEventFound(true);
-      }
-      const eventDatabase = [];
-      eventDoc.forEach((document) => {
-        const place = document.data().Place;
-        const payer = document.data().namePaid[0];
-        const amountPaid = document.data().amountPaid;
-        const date = document.data().Date;
-        const newEventInformation = {place, payer, amountPaid,date};
+        setEmptyList(false);
 
-        eventDatabase.push(newEventInformation);
-      });
-      setEventInfo(eventDatabase);
+      }
+      else{
+        const ss = eventDoc.size;
+        console.log("In dboard, size is", ss);
+        if(typeof(ss) === "undefined"){
+          console.log("UNDEFNIED");
+            return;
+        }
+        else{
+          console.log("SUCCESS");
+          if(ss === 0){
+            setEmptyList(true);
+            console.log("set empty list to true");
+          }
+          else{
+            console.log("Set emptyList to false");
+            setEmptyList(false);
+          }
+          setEventFound(true);
+        }
+      }
+
+        const eventDatabase = [];
+        eventDoc.forEach((document) => {
+          const place = document.data().Place;
+          const payer = document.data().namePaid[0];
+          const amountPaid = document.data().amountPaid;
+          const date = document.data().Date;
+          const atendees = document.data().peopleAttending;
+          const newEventInformation = {place, payer, amountPaid,date,atendees};
+
+          eventDatabase.push(newEventInformation);
+        });
+        setEventInfo(eventDatabase);
+    
       // console.log(eventInfo[0].date); // Access the updated state
-      // console.log(eventInfo[1].date); // Access the updated state
+      // console.log(eventInfo[1].date); // Access the sd state
 
     } catch (err) {
       console.error(err);
@@ -94,6 +340,34 @@ function Dboard() {
     }
   };
 
+  //This is where we are working
+  const graphStuff = async () => {
+    const names = groupUsers;
+    const dummy = new Graph(groupName,names);
+
+    // function getDebtors(allNames,payerName){
+    //   return allNames.filter(item => item !== payerName);
+    // }
+    eventInfo.forEach(ev =>{
+      console.log("ATENDEES ARE ",ev.atendees);
+      const debts = ev.atendees;
+      if(debts.length !== 0){
+        dummy.groupPurchase(ev.payer, debts, ev.amountPaid);
+      }
+    });
+    //dummy.Optimize();
+    dummy.printNodesAndEdges();
+    const optum = new OptimizeCosts(dummy);
+    optum.calculate();
+    const finalGraph = optum.getGraph();
+    //finalGraph.caseA();
+    finalGraph.printNodesAndEdges();
+    const retGraph = optum.getGraph();
+    //retGraph.printNodesAndEdges();
+    //return retGraph;
+    setFinalGraphEdges(retGraph.getAllEdges());
+    return retGraph.getAllEdges();
+}
   const pastPayments = {
     payments: eventInfo.map((event) => ({
       date: event.date,
@@ -141,153 +415,748 @@ function Dboard() {
     fetchUserName();
     if(!eventFound){
       getSomeGroup(currGroupName);
+      console.log("INFINITE LOOP");
+    }
+    if(readyToUpload){
+      console.log("final graph edges are",finalGraphEdges);
+      //uploadEdgesToFirebase(finalGraphEdges);
+      setReadyToUpload(false);
+    }
+    if(eventFound && graphObjectMake && !emptyList){
+      //graphStuff();
+      //uploadEdgesToFirebase(finalGraphEdges);
+      setGraphObjectMake(false);
+      setReadyToUpload(true);
+
+    }
+    else{
+      if(emptyList){
+        console.log("Empty list ERROR");
+      }
+      if(!eventFound){
+        console.log("Event found error");
+      }
+      if(!graphObjectMake){
+        console.log("NOT MAKING GRAPH OBJECT");
+      }
     }
       console.log("Your username is " + name);
     console.log("Your groupname is ", groupName);
 
-  }, [user, loading, navigate, fetchUserName]);
+  }, [user, loading, navigate, fetchUserName,emptyList]);
+const people = [
+  {
+    name: 'Jane Cooper',
+    title: 'Regional Paradigm Technician',
+    department: 'Optimization',
+    role: 'Admin',
+    email: 'jane.cooper@example.com',
+    image: 'https://bit.ly/33HnjK0',
+  },
+  {
+    name: 'John Doe',
+    title: 'Regional Paradigm Technician',
+    department: 'Optimization',
+    role: 'Tester',
+    email: 'john.doe@example.com',
+    image: 'https://bit.ly/3I9nL2D',
+  },
+  {
+    name: 'Veronica Lodge',
+    title: 'Regional Paradigm Technician',
+    department: 'Optimization',
+    role: ' Software Engineer',
+    email: 'veronica.lodge@example.com',
+    image: 'https://bit.ly/3vaOTe1',
+  },
+  // More people...
+];
+return (
+  <div id="inbox" className="bg-gray-900 text-white">
+  <Navbar userEmail={user?.email}/>
+  <div className="bg-gray-900 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div className="w-full mx-auto bg-gray-800 p-8 rounded-lg shadow-lg">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+        <button className="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg mr-4" type="button" onClick={() => uploadEdgesToFirebase()}>
+            Upload Payments
+          </button>
+        </div>
+      </div>
+      <div className="text-white text-4xl font-semibold mt-6 mb-6">
+        Welcome back {name}.
+      </div>
+      <div className="text-white text-4xl font-semibold mb-6">
+        {currGroupName}'s Trip Receipt
+      </div>
+      <div className="text-white text-2xl mb-6">Recent Group Payments</div>
+      <div className="table-wrapper">
+      <table className="table-auto w-5/6 text-white mb-6">
+  <tbody>
+    <tr>
+      <td className="w-5/4 p-6">Date</td>
+      {pastPayments.payments.map((item, i) => (
+        <td key={i} className="w-5/4 p-6 whitespace-nowrap overflow-hidden overflow-ellipsis">
+          {new Date(item.date).toLocaleDateString([], {
+            month: 'short',
+            day: 'numeric',
+          })}
+        </td>
+      ))}
+    </tr>
+    <tr>
+      <td className="w-5/4 p-6">Payer</td>
+      {pastPayments.payments.map((item, i) => (
+        <td key={i} className="w-5/4 p-6 whitespace-nowrap overflow-hidden overflow-ellipsis">
+          {item.payer}
+        </td>
+      ))}
+    </tr>
+    <tr>
+      <td className="w-5/4 p-6">Place</td>
+      {pastPayments.payments.map((item, i) => (
+        <td key={i} className="w-5/4 p-6 whitespace-nowrap overflow-hidden overflow-ellipsis">
+          {item.place}
+        </td>
+      ))}
+    </tr>
+    <tr>
+      <td className="w-5/4 p-6">Amount</td>
+      {pastPayments.payments.map((item, i) => (
+        <td key={i} className="w-5/4 p-6 whitespace-nowrap overflow-hidden overflow-ellipsis">
+          ${item.amount}
+        </td>
+      ))}
+    </tr>
+    {/* Add more table rows as needed */}
+  </tbody>
+</table>
 
 
 
-  return (
-    <div className = "wholePage">
-    <div className="Dboard">
-       <div className="Dboard_navbar">
+
+</div>
+
+      <p className="text-white text-xl mb-6">
+        Remaining balance: ${balance}
+      </p>
+      <div className="text-white text-2xl mb-6">Enter a new Payment</div>
+      <div className="flex items-center justify-between mb-6">
+        <div className="text-white">
+          <p>Scan a receipt</p>
+          <MdOutlineDocumentScanner size={48} />
+        </div>
+        <div className="text-white" onClick={handleOpening}>
+          <p>Manual Input</p>
+          <ImListNumbered size={40} />
+        </div>
+      </div>
+    </div>
+    <Modal
+      isOpen={modalIsOpen}
+      onRequestClose={closeModal}
+      className="modal"
+      overlayClassName="overlay"
+    >
+      <h2 className="text-4xl font-semibold mb-6">Payment Form</h2>
+      <form className="formStyle" onSubmit={handleSubmit}>
+        <button
+          className="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg absolute right-4 top-4"
+          onClick={handleClose}
+        >
+          <AiOutlineCloseCircle size={48} />
+        </button>
+        <p className="text-xl mb-2">Price*</p>
+        <input
+          className="w-full py-2 px-4 mb-4 rounded-lg"
+          type="number"
+          name="totalPrice"
+          value={paymentValues.totalPrice}
+          onChange={handleChange}
+        />
+        <p className="text-xl mb-2">Members of Group*</p>
+        <Select
+          isMulti={true}
+          value={selectedUsers}
+          options={allUsers}
+          onChange={handleSelect}
+        />
+        <br />
+        <div className="flex justify-between">
+          <button
+            type="button"
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mb-4"
+            onClick={handleSelectAll}
+          >
+            Select All
+          </button>
+          <button
+            type="button"
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mb-4"
+            onClick={handleDeselectAll}
+          >
+            Deselect All
+          </button>
+        </div>
+        <p className="text-xl mb-2">Payer*</p>
+        <select
+          name="personPaid"
+          value={paymentValues.personPaid}
+          className="w-full py-2 px-4 mb-4 rounded-lg"
+          onChange={handleChange}
+        >
+          <option value="select">Select</option>
+          {selectedUsers.map((user) => (
+            <option key={user.label} value={user.label}>
+              {user.label}
+            </option>
+          ))}
+        </select>
+        <p className="text-xl mb-2">Additional Info</p>
+        <div className="extraInfo">
+          <input
+            type="date"
+            name="date"
+            value={paymentValues.date}
+            onChange={handleChange}
+            className="w-full py-2 px-4 mb-4 rounded-lg"
+            pattern="^[0-9]*/[0-9]*$"
+          />
+          <br />
+          <input
+            type="text"
+            name="place"
+            value={paymentValues.place}
+            onChange={handleChange}
+            placeholder=""
+            className="w-full py-2 px-4 mb-4 rounded-lg"
+          />
+          <br />
+          <input
+            type="text"
+            name="description"
+            value={paymentValues.description}
+            onChange={handleChange}
+            placeholder=""
+            className="w-full py-2 px-4 mb-4 rounded-lg"
+          />
+        </div>
+        <br />
+        <button
+          type="submit"
+          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
+        >
+          Submit
+        </button>
+        <br />
+        <button
+          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
+          onClick={handleClose}
+        >
+          Close
+        </button>
+      </form>
+    </Modal>
+  </div>
+  </div>
+);
+
+//This is the OG imeplementation, dont delete
+//   return (
+//     <div className="bg-gray-900 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+//       <div className="w-full mx-auto bg-gray-800 p-8 rounded-lg shadow-lg">
+//         <div className="flex items-center justify-between">
+//           <div className="flex items-center">
+//           <button className="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg mr-4" type="button" onClick={() => uploadEdgesToFirebase(finalGraphEdges)}>
+//               Upload Payments
+//             </button>
+//             <button className="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg mr-4">
+//               <Link to="/GroupSelection">Manage Groups</Link>
+//             </button>
+//             <Link
+//               to="/Inbox"
+//               className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-xl"
+//             >
+//               Inbox
+//             </Link>
+//             <div className="relative inline-block ml-4">
+//               <button className="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg">
+//                 {user?.email}
+//               </button>
+//               <div className="absolute hidden mt-2 w-32 bg-gray-800 rounded-md shadow-lg">
+//                 <div className="py-1">
+//                   <div
+//                     className="block px-4 py-2 text-sm text-white hover:bg-gray-700 cursor-pointer"
+//                     onClick={logout}
+//                   >
+//                     Logout
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//         <div className="text-white text-4xl font-semibold mb-6">
+//           Welcome back {name}.
+//         </div>
+//         <div className="text-white text-4xl font-semibold mb-6">
+//           {currGroupName}'s Trip Receipt
+//         </div>
+//         <div className="text-white text-2xl mb-6">Recent Group Payments</div>
+//         <div className="table-wrapper">
+//   <table className="table-auto w-full text-white mb-6">
+//     <tbody>
+//       <tr>
+//         <th className="w-5/4 px-4 py-2">Date</th>
+//         {pastPayments.payments.map((item, i) => (
+//           <td key={i} className="w-5/4 px-4 py-2">
+//             {item.date}
+//           </td>
+//         ))}
+//       </tr>
+//       <tr>
+//         <td className="w-5/4 p-6">Payer</td>
+//         {pastPayments.payments.map((item, i) => (
+//           <td key={i} className="w-5/4 p-6">
+//             {item.payer}
+//           </td>
+//         ))}
+//       </tr>
+//       <tr>
+//         <td className="w-5/4 p-6">Place</td>
+//         {pastPayments.payments.map((item, i) => (
+//           <td key={i} className="w-5/4 p-6">
+//             {item.place}
+//           </td>
+//         ))}
+//       </tr>
+//       <tr>
+//         <td className="w-5/4 p-6">Amount</td>
+//         {pastPayments.payments.map((item, i) => (
+//           <td key={i} className="w-5/4 p-6">
+//             ${item.amount}
+//           </td>
+//         ))}
+//       </tr>
+//     </tbody>
+//   </table>
+// </div>
+
+//         <p className="text-white text-xl mb-6">
+//           Remaining balance: ${balance}
+//         </p>
+//         <div className="text-white text-2xl mb-6">Enter a new Payment</div>
+//         <div className="flex items-center justify-between mb-6">
+//           <div className="text-white">
+//             <p>Scan a receipt</p>
+//             <MdOutlineDocumentScanner size={48} />
+//           </div>
+//           <div className="text-white" onClick={handleOpening}>
+//             <p>Manual Input</p>
+//             <ImListNumbered size={40} />
+//           </div>
+//         </div>
+//       </div>
+//       <Modal
+//         isOpen={modalIsOpen}
+//         onRequestClose={closeModal}
+//         className="modal"
+//         overlayClassName="overlay"
+//       >
+//         <h2 className="text-4xl font-semibold mb-6">Payment Form</h2>
+//         <form className="formStyle" onSubmit={handleSubmit}>
+//           <button
+//             className="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg absolute right-4 top-4"
+//             onClick={handleClose}
+//           >
+//             <AiOutlineCloseCircle size={48} />
+//           </button>
+//           <p className="text-xl mb-2">Price*</p>
+//           <input
+//             className="w-full py-2 px-4 mb-4 rounded-lg"
+//             type="number"
+//             name="totalPrice"
+//             value={paymentValues.totalPrice}
+//             onChange={handleChange}
+//           />
+//           <p className="text-xl mb-2">Members of Group*</p>
+//           <Select
+//             isMulti={true}
+//             value={selectedUsers}
+//             options={allUsers}
+//             onChange={handleSelect}
+//           />
+//           <br />
+//           <div className="flex justify-between">
+//             <button
+//               type="button"
+//               className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mb-4"
+//               onClick={handleSelectAll}
+//             >
+//               Select All
+//             </button>
+//             <button
+//               type="button"
+//               className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mb-4"
+//               onClick={handleDeselectAll}
+//             >
+//               Deselect All
+//             </button>
+//           </div>
+//           <p className="text-xl mb-2">Payer*</p>
+//           <select
+//             name="personPaid"
+//             value={paymentValues.personPaid}
+//             className="w-full py-2 px-4 mb-4 rounded-lg"
+//             onChange={handleChange}
+//           >
+//             <option value="select">Select</option>
+//             {selectedUsers.map((user) => (
+//               <option key={user.label} value={user.label}>
+//                 {user.label}
+//               </option>
+//             ))}
+//           </select>
+//           <p className="text-xl mb-2">Additional Info</p>
+//           <div className="extraInfo">
+//             <input
+//               type="date"
+//               name="date"
+//               value={paymentValues.date}
+//               onChange={handleChange}
+//               className="w-full py-2 px-4 mb-4 rounded-lg"
+//               pattern="^[0-9]*/[0-9]*$"
+//             />
+//             <br />
+//             <input
+//               type="text"
+//               name="place"
+//               value={paymentValues.place}
+//               onChange={handleChange}
+//               placeholder=""
+//               className="w-full py-2 px-4 mb-4 rounded-lg"
+//             />
+//             <br />
+//             <input
+//               type="text"
+//               name="description"
+//               value={paymentValues.description}
+//               onChange={handleChange}
+//               placeholder=""
+//               className="w-full py-2 px-4 mb-4 rounded-lg"
+//             />
+//           </div>
+//           <br />
+//           <button
+//             type="submit"
+//             className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
+//           >
+//             Submit
+//           </button>
+//           <br />
+//           <button
+//             className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
+//             onClick={handleClose}
+//           >
+//             Close
+//           </button>
+//         </form>
+//       </Modal>
+//     </div>
+//   );
+  
+};
+
+
+
+
+
+
+//What Rahul M needs to test
+//<div id="inbox" className="bg-gray-900 text-white">
+//<Navbar userEmail={user?.email}/>
+
+
+//   return (
+//     <div className = "wholePage">
+//     <div className="Dboard">
+//        <div className="Dboard_navbar">
          
-          <div className="Dboard_nav_buttons">
-            <button className="Dboard__btn"><Link to="/GroupSelection">Manage Groups</Link></button>
-            <button className="Dboard__btn" onClick={() => addDocument("6/2","BJs",81,"testgroup","breakfast",["sanjay"])}>My Payments</button>
-            <div class="dropdown">
-              <div className = "centered-text">
-                <button class="Dboard__btn">{user?.email}</button>
-              </div>
+//           <div className="Dboard_nav_buttons">
+//             <button className="Dboard__btn"><Link to="/GroupSelection">Manage Groups</Link></button>
+//             {/*<button className="Dboard__btn" onClick={() => uploadEdgesToFirebase(finalGraphEdges)}>My Payments</button>*/}
+//             <Link to="/Inbox" className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full text-xl">
+//           Inbox
+//         </Link>
+//             <div class="dropdown">
+//               <div className = "centered-text">
+//                 <button class="Dboard__btn">{user?.email}</button>
+//               </div>
               
-              <div class="dropdown-child" onClick = {logout}>
-                Logout
-              </div>
-            </div>
-            {/*<button className="Dboard__btn">{user?.email}</button>*/}
+//               <div class="dropdown-child" onClick = {logout}>
+//                 Logout
+//               </div>
+//             </div>
+//             {/*<button className="Dboard__btn">{user?.email}</button>*/}
              
-          </div>
-       </div>
-      <div className = "header1" >Welcome back {name}. </div>
-    <div className = "groupBalance" style={{ fontSize: '40px' }}>
-      <p>{currGroupName}'s Trip Receipt</p>
+//           </div>
+//        </div>
+//       <div className = "header1" >Welcome back {name}. </div>
+//     <div className = "groupBalance" style={{ fontSize: '40px' }}>
+//       <p>{currGroupName}'s Trip Receipt</p>
       
     
-  <div className = "DataTitle">Recent Group Payments</div>
+//   <div className = "DataTitle">Recent Group Payments</div>
 
-<div className = "dataTable">
-      <table className = "tableFormat">
-      <tbody>
-        {/*
-          <tr>
-            <td>Place</td>
-            {pastPayments.payments.map((item, i) => (
-              <td key={i}>{item.place}</td>
-            ))}
-            </tr>  */}
+// <div className = "dataTable">
+//       <table className = "tableFormat">
+//       <tbody>
+//         {/*
+//           <tr>
+//             <td>Place</td>
+//             {pastPayments.payments.map((item, i) => (
+//               <td key={i}>{item.place}</td>
+//             ))}
+//             </tr>  */}
 
-        <tr>
-          <td>Date</td>
-          {pastPayments.payments.map((item, i) => (
-            <td key={i}>{item.date}</td>
-          ))}
-        </tr>
+//         <tr>
+//           <td>Date</td>
+//           {pastPayments.payments.map((item, i) => (
+//             <td key={i}>{item.date}</td>
+//           ))}
+//         </tr>
        
-        <tr>
-          <td>Payer</td>
-          {pastPayments.payments.map((item, i) => (
-            <td key={i}>{item.payer}</td>
-          ))}
-        </tr>
-        <tr>
-          <td>Place</td>
-          {pastPayments.payments.map((item, i) => (
-            <td key={i}>{item.place}</td>
-          ))}
-        </tr>
-        <tr>
-          <td>Amount</td>
-          {pastPayments.payments.map((item, i) => (
-            <td key={i}>${item.amount}</td>
-          ))}
-        </tr>
-    </tbody>
-    </table>
-
-    
-
-
-</div>
-
-<p>Remaining balance: ${balance} </p>
-
-
-      
-      </div>
-      
-  <div className="label1">
-    <p>Enter a new Payment</p>
-  </div>
-  <div className="pictureButton">
-
-    <div className="scanReceipt">
-        <p>Scan a receipt</p>
-        <MdOutlineDocumentScanner size={48}/>
-      </div>
-
-    <div className="inputManual">
-      <p>Manual Input</p>
-      <ImListNumbered size={40}/>
-
-    </div>
-
-    <div className="yourPayments">
-      <div className="paylabel">
-        <p>Manage your payments</p>
-      </div>
-      <div className = "dataTable2">
-      <table className = "tableFormat2">
-      <tbody>
-        {/*
-          <tr>
-            <td>Place</td>
-            {pastPayments.payments.map((item, i) => (
-              <td key={i}>{item.place}</td>
-            ))}
-            </tr>  */}
-
-        <tr>
-          <td>Date</td>
-          {pastPayments.userPayments.map((item, i) => (
-            <td key={i}>{item.date}</td>
-          ))}
-        </tr>
-       
-        <tr>
-          <td>Pay to</td>
-          {pastPayments.userPayments.map((item, i) => (
-            <td key={i}>{item.otherUser}</td>
-          ))}
-        </tr>
-       
-        <tr>
-          <td>Amount</td>
-          {pastPayments.userPayments.map((item, i) => (
-            <td key={i}>${item.amount}</td>
-          ))}
-        </tr>
-    </tbody>
-    </table>
+//         <tr>
+//           <td>Payer</td>
+//           {pastPayments.payments.map((item, i) => (
+//             <td key={i}>{item.payer}</td>
+//           ))}
+//         </tr>
+//         <tr>
+//           <td>Place</td>
+//           {pastPayments.payments.map((item, i) => (
+//             <td key={i}>{item.place}</td>
+//           ))}
+//         </tr>
+//         <tr>
+//           <td>Amount</td>
+//           {pastPayments.payments.map((item, i) => (
+//             <td key={i}>${item.amount}</td>
+//           ))}
+//         </tr>
+//     </tbody>
+//     </table>
 
     
 
-</div>
-    </div>
-  </div>
-     </div>
-     </div>
-  );
-}
+
+// </div>
+
+// <p>Remaining balance: ${balance} </p>
+
+
+      
+//       </div>
+      
+//   <div className="label1">
+//     <p>Enter a new Payment</p>
+//   </div>
+//   <div className="pictureButton">
+
+//     <div className="scanReceipt">
+//         <p>Scan a receipt</p>
+//         <MdOutlineDocumentScanner size={48}/>
+//       </div>
+
+//       <div className="inputManual" onClick={handleOpening}>
+//     <Modal 
+//     isOpen={modalIsOpen} 
+//     onRequestClose={closeModal}
+//     className="modal"
+//     overlayClassName="overlay"
+    
+//     >
+      
+      
+//         <h2 className="modalTitle">Payment Form</h2>
+//         <form className="formStyle" onSubmit={handleSubmit}>
+//         <button className="closeButton" onClick={handleClose}>
+//       <AiOutlineCloseCircle size={48}/>
+//       </button>
+//           <p className="subtitle">Price*</p>
+//           <input
+//             className="priceStyle"
+//             type="number"
+//             name="totalPrice"
+//             value={paymentValues.totalPrice}
+//             onChange={handleChange}
+//             placeholder=""
+//             //required
+//           />
+   
+      
+         
+
+// {/*
+//           <select 
+//             multiple={true}
+//             value={selectedUsers} 
+//             onChange={(e) => handleSelect(e.target.selectedOptions)}>
+//             {users.map((option) => (
+//               <option key={option} value={option}>
+//                 {option}
+//               </option>
+//             ))}
+//           </select>
+//             */}
+//           <p className="subtitle2">Members of Group*</p>
+//           <Select
+//             isMulti={true}
+//             value={selectedUsers}
+//             options={allUsers}
+//             onChange={handleSelect}
+//             //required
+          
+          
+//           />
+
+//           <br />
+//           <div className="selectButton">
+//           <button type="button" className="sButton" onClick={handleSelectAll}>Select All</button>
+//           <button type="button" className="sButton" onClick={handleDeselectAll}>Deselect All</button>
+//           </div>
+          
+
+
+
+//           <p className="subtitle2">Payer*</p>
+//           <select 
+//             name="personPaid"
+//             value={paymentValues.personPaid} 
+//             className="payerStyle"
+//             onChange={handleChange}
+//             placeholder="Select..."
+//             //required
+//             >
+//             <option key="select" value="select">Select</option>,
+//             {selectedUsers.map((user) => (
+              
+//               <option key={user.label} value={user.label}>{user.label}</option>
+//             ))}
+
+//             {/*
+//             {options.map((option) => (
+//               <option key={option} value={option}>
+//                 {option}
+//               </option>
+//             ))}*/}
+//           </select>
+
+//           <p className="subtitle2">Additional Info</p>
+          
+//           <div className="extraInfo">
+
+          
+//           <input
+//             type="date"
+//             name="date"
+//             value={paymentValues.date}
+//             onChange={handleChange}
+//             className="smallButton"
+//             pattern="^[0-9]*/[0-9]*$"
+//             //required
+//           /><label htmlFor="date">
+//           Enter Date<span className="required-field">*</span>
+//         </label>
+//           <br />
+
+//           <input
+            
+//             type="text"
+//             name="place"
+//             value={paymentValues.place}
+//             onChange={handleChange}
+//             placeholder=""
+//             className="smallButton"
+//             //required
+//           /><label htmlFor="date">
+//           Enter Place<span className="required-field">*</span>
+//         </label>
+//           <br />
+
+//           <input
+//             type="text"
+//             name="description"
+//             value={paymentValues.description}
+//             onChange={handleChange}
+//             placeholder=""
+//             className="smallButton"
+//           /><label htmlFor="date">
+//           Short Description<span className="required-field">*</span>
+//         </label>
+//           </div>
+//           <br />
+//           {/* Add more input fields for other payment values */}
+          
+        
+
+
+
+//           <button type="submit" className="submitButton">Submit</button>
+//           <br />
+//           <button className="closingButton" onClick={handleClose}>Close</button>
+//         </form>
+//       </Modal>
+//       <p>Manual Input</p>
+//       <ImListNumbered size={40}/>
+
+//     </div>
+
+//     <div className="yourPayments">
+//       <div className="paylabel">
+//         <p>Manage your payments</p>
+//       </div>
+//       <div className = "dataTable2">
+//       <table className = "tableFormat2">
+//       <tbody>
+//         {/*
+//           <tr>
+//             <td>Place</td>
+//             {pastPayments.payments.map((item, i) => (
+//               <td key={i}>{item.place}</td>
+//             ))}
+//             </tr>  */}
+
+//         <tr>
+//           <td>Date</td>
+//           {pastPayments.userPayments.map((item, i) => (
+//             <td key={i}>{item.date}</td>
+//           ))}
+//         </tr>
+       
+//         <tr>
+//           <td>Pay to</td>
+//           {pastPayments.userPayments.map((item, i) => (
+//             <td key={i}>{item.otherUser}</td>
+//           ))}
+//         </tr>
+       
+//         <tr>
+//           <td>Amount</td>
+//           {pastPayments.userPayments.map((item, i) => (
+//             <td key={i}>${item.amount}</td>
+//           ))}
+//         </tr>
+//     </tbody>
+//     </table>
+
+    
+
+// </div>
+//     </div>
+//   </div>
+//      </div>
+//      </div>
+//   );
+// }
 export default Dboard;

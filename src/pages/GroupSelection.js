@@ -10,6 +10,7 @@ import {AiOutlinePlusCircle} from 'react-icons/ai';
 import {CgEnter} from 'react-icons/cg';
 import {FiSettings} from 'react-icons/fi';
 import currentGroupVar from './currentGroupVar';
+import Navbar from './Navbar';
 
 export default function GroupSelection(){
 
@@ -32,20 +33,31 @@ export default function GroupSelection(){
       //console.log(name);
     } catch (err) {
       console.error(err);
-      alert("An error occured while fetching user data");
+      //alert("An error occured while fetching user data");
     }
   };
 
   const getGroupsForUser = async (name) => {
     try{
         console.log("Called function");
-      const quer = query(collection(db,"Groups"),where("users", "array-contains", name));
+      const quer = await query(collection(db,"Groups"),where("users", "array-contains", name));
       const querySnapshot = await getDocs(quer);
-      if(querySnapshot.empty == false){
+      if(querySnapshot.empty === false){
         setgotGroups(true);
       }
       else{
-        setgotGroups(false);
+          const sz = querySnapshot.docs.size;
+          console.log("sz is ",sz);
+          console.log("Query should have ended");
+          if(typeof(sz) === "undefined"){
+            console.log("Undefined, trying again");
+          }
+          else{
+            console.log("Its true; not undefined");
+            setgotGroups(true);
+          }
+          
+        
       }
       const groupList = querySnapshot.docs.map((doc) => {
         const groupData = doc.data();
@@ -98,37 +110,20 @@ export default function GroupSelection(){
   const groupNameArr = ["testGrouerh", "anotherTest", "aThirdTest", "anotherTest", "anotherTest", "aThirdTest" ];
   const colorChoices = ["#b5ecf7", "#f0dda1", "#bddebd", "#d9ccf0",  "#f7b0ad", "#b2f2a2"]
   return (
-    <div className="Dboard">
-       <div className="Dboard_navbar">
-         
-          <div className="Dboard_nav_buttons">
-            <button className="Dboard__btn"><Link to="/GroupSelection">Manage Groups</Link></button>
-            <button className="Dboard__btn">My Payments</button>
-            <div class="dropdown">
-              <div className = "centered-text">
-                <button class="Dboard__btn">{user?.email}</button>
-              </div>
-              
-              <div class="dropdown-child" onClick = {logout}>
-                Logout
-              </div>
-            </div>
-            {/*<button className="Dboard__btn">{user?.email}</button>*/}
-             
-          </div>
-       </div>
-    <div className="grid-container">
-        <div class="grid">
+    <div id="inbox" className="bg-gray-900 text-white">
+  <Navbar userEmail={user?.email} />
+       <div className="grid-container">
+         <div className="grid">
             <div className="square" style={{backgroundColor: "#e3e1e1"}}>
-                <p>Add / Join Group</p>
-                <Link to="/NewGroup" className="plusSymbol">
-                    <AiOutlinePlusCircle size={69}/>
-                </Link>
+                 <p>Add / Join Group</p>
+                 <Link to="/NewGroup" className="plusSymbol">
+                     <AiOutlinePlusCircle size={69}/>
+                 </Link>
                 
             
-            </div>
+             </div>
 
-            {groupNames.map((groupName, index) => (
+             {groupNames.map((groupName, index) => (
                 <div key = {index} className="square" style={{backgroundColor: colorChoices[index % colorChoices.length]}}>
                     <div className="square-text">
                         {groupName}
@@ -161,5 +156,80 @@ export default function GroupSelection(){
       <p></p>
     </div>
     </div>
+
   );
+
+
+
+
+
+  //This the OGGGGGGGGGGGGGGGGG
+  // return (
+  //   <div className="Dboard">
+  //      <div className="Dboard_navbar">
+  //         <div className="Dboard_nav_buttons">
+  //           <button className="Dboard__btn"><Link to="/GroupSelection">Manage Groups</Link></button>
+  //           <button className="Dboard__btn">My Payments</button>
+  //           <div class="dropdown">
+  //             <div className = "centered-text">
+  //               <button class="Dboard__btn">{user?.email}</button>
+  //             </div>
+              
+              // <div class="dropdown-child" onClick = {logout}>
+              //   Logout
+              // </div>
+  //           </div>
+  //           {/*<button className="Dboard__btn">{user?.email}</button>*/}
+             
+  //         </div>
+  //      </div>
+  //   <div className="grid-container">
+  //       <div className="grid">
+  //           <div className="square" style={{backgroundColor: "#e3e1e1"}}>
+  //               <p>Add / Join Group</p>
+  //               <Link to="/NewGroup" className="plusSymbol">
+  //                   <AiOutlinePlusCircle size={69}/>
+  //               </Link>
+                
+            
+  //           </div>
+
+  //           {groupNames.map((groupName, index) => (
+  //               <div key = {index} className="square" style={{backgroundColor: colorChoices[index % colorChoices.length]}}>
+  //                   <div className="square-text">
+  //                       {groupName}
+  //                   </div>
+  //                   <div className="square-contain">
+  //                   <Link 
+  //                       to={'/dashboard'}
+  //                       state={{currGroupName: groupName}}
+  //                       >
+  //                           <div className="subSquare">
+  //                           <CgEnter size={65}/>
+  //                           </div>       
+  //                    </Link>
+                     
+  //                    <Link 
+  //                       to={'/dashboard'}
+  //                       state={{currGroupName: groupName}}
+  //                       >
+  //                           <div className="subSquare2">
+  //                           <FiSettings size={62}/>
+  //                           </div>
+      
+  //                    </Link>
+  //                       </div>
+  //               </div>
+  //           )
+  //           )}
+            
+  //       </div>
+  //     <p></p>
+  //   </div>
+  //   </div>
+  // );
+
+
+
 }
+

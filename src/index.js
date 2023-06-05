@@ -1,7 +1,7 @@
 import React, { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
-
+import 'tailwindcss/tailwind.css';
 import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import Home from "./pages/Home";
 import UserProfile from "./pages/UserProfile";
@@ -14,6 +14,8 @@ import Groups from "./pages/Groups";
 import NewGroup from "./pages/NewGroup";
 import Loading from "./pages/LoadingPage";
 import GroupSelection from "./pages/GroupSelection";
+import Inbox from "./pages/Inbox";
+import Receipt from "./pages/Receipt";
 
 function App() {
   return (
@@ -31,6 +33,8 @@ function App() {
           <Route exact path="Home" element={<Home />} />
           <Route exact path="/loading" element={<Loading />} />
           <Route exact path="/GroupSelection" element={<GroupSelection />} />
+          <Route exact path="/Inbox" element={<Inbox />} />
+          <Route exact path="/receipt" element={<Receipt />} />
         </Routes>
       </Router>
     </div>
