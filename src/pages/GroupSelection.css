@@ -10,7 +10,9 @@
     right: 280px;
     top: 100px;
 }
-
+body{
+    background-color:  #080225;
+}
 .square {
     z-index: 2;
     align-items: center;
@@ -74,4 +76,3 @@
     position: relative;
     top: 17px;
 }
-

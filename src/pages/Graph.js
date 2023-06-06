@@ -177,6 +177,9 @@ class Graph{
     printNodesAndEdges() {
 
         console.log(`Nodes and Edges in Graph ${this.name}:`);
+        if(this.nodeList.length === 0){
+            return;
+        }
         this.nodeList.forEach((node) => {
           console.log(`Node: ${node.getName()}`);
           node.printEdges();

@@ -13,6 +13,7 @@
   flex-grow: 1;
   padding: 30px;
 }
+
 .Dboard__btn {
   padding: 10px;
   font-size: 18px;
@@ -141,6 +142,9 @@ height: 50px;
 margin-bottom: 15px;
 }
 
+body{
+  background-color: #333;
+}
 .centered-text:hover{
 background-color: #4bcbb0;
 }
@@ -521,4 +525,12 @@ background-color: #f18a8a;
 border-style: dashed;
 border-color: black;
 border-width: 3px;
+}
+
+.chart-container {
+  position: relative;
+  left: 70px;
+  width: 800px;
+
+/* Adjust the height as needed */
 }

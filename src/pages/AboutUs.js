@@ -1,10 +1,11 @@
 import { Element, scroller } from "react-scroll";
 import { Link } from 'react-router-dom';
+import {rahul} from './TheGaot.png'
 
 function AboutUs() {
   const scrollToFeatures = () => {
     scroller.scrollTo("features", {
-      duration: 800,
+      duration: 3200,
       delay: 0,
       smooth: "easeInOutQuart",
       offset: -80 // Adjust this offset value as needed to align with your page layout
@@ -42,7 +43,7 @@ function AboutUs() {
           <div className="bg-white h-90vh rounded-lg shadow-lg p-8 mx-4 mb-8">
             <h2 className="text-3xl font-bold mb-4">Rahul M</h2>
             <div className="flex items-center justify-center mb-4">
-              <img src="TheGaot.png" alt="Expense Management" className="max-w-full max-h-48" />
+              <img src="https://m.media-amazon.com/images/I/7186AqfE-ML.jpg" alt="Pronouns: is/Him" className="max-w-full max-h-48" />
             </div>
             <p className="text-gray-800">
 Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuorfhqp3
@@ -56,7 +57,7 @@ Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuo
           <div className="bg-white h-90vh rounded-lg shadow-lg p-8 mx-4 mb-8">
             <h2 className="text-3xl font-bold mb-4">Vishnu M</h2>
             <div className="flex items-center justify-center mb-4">
-              <img src="image2.jpg" alt="Payment Splitting" className="max-w-full max-h-48" />
+              <img src="https://www.sell2bbnovelties.com/mm5/lego/LEGO_NJ_MF_cole_45.jpg" alt="Payment Splitting" className="max-w-full max-h-48" />
             </div>
             <p className="text-gray-800">
             Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuorfhqp3
@@ -69,7 +70,32 @@ Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuo
           <div className="bg-white h-90vh rounded-lg shadow-lg p-8 mx-4 mb-8">
             <h2 className="text-3xl font-bold mb-4">Rahul K</h2>
             <div className="flex items-center justify-center mb-4">
-              <img src="image3.jpg" alt="Trip Planning" className="max-w-full max-h-48" />
+              <img src="https://m.media-amazon.com/images/I/61BiLeQReOL.jpg" alt="Trip Planning" className="max-w-full max-h-48" />
+            </div>
+            <p className="text-gray-800">
+            Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuorfhqp3
+Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuorfhqp3
+Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuorfhqp3
+            </p>
+          </div>
+        </Element>
+        <Element name="features">
+          <div className="bg-white h-90vh rounded-lg shadow-lg p-8 mx-4 mb-8">
+            <h2 className="text-3xl font-bold mb-4">Gabriel M</h2>
+            <div className="flex items-center justify-center mb-4">
+              <img src="https://i5.walmartimages.com/asr/76dd8d42-f32c-4315-9e72-562775542241_1.0f1bc7cd394694f194df8be13f713f3e.jpeg" alt="Trip Planning" className="max-w-full max-h-48" />
+            </div>
+            <p className="text-gray-800">
+            DUDDEEE I"M LITERALLY THE WHITE NINJA
+            </p>
+
+          </div>
+        </Element>
+        <Element name="features">
+          <div className="bg-white h-90vh rounded-lg shadow-lg p-8 mx-4 mb-8">
+            <h2 className="text-3xl font-bold mb-4">Srikar N</h2>
+            <div className="flex items-center justify-center mb-4">
+              <img src="https://m.media-amazon.com/images/I/51ev9k0FzML.jpg" alt="Trip Planning" className="max-w-full max-h-48" />
             </div>
             <p className="text-gray-800">
             Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuorfhqp3

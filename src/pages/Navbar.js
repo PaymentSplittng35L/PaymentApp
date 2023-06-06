@@ -11,7 +11,6 @@ function Navbar({ userEmail }) {
   const navbarItems = [
     { path: '/Inbox', label: 'Inbox' },
     { path: '/GroupSelection', label: 'My Groups' },
-    { path: '/contact', label: 'Your Boy Toy' },
   ];
 
   const handleEmailClick = () => {
@@ -31,35 +30,44 @@ function Navbar({ userEmail }) {
     };
   }, []);
 
+  const logstuff = () =>{
+    logout();
+  };
+
+
   return (
-    <nav className="bg-gray-900 text-white p-4 text-3xl font-thin">
+    <nav className="bg-gray-800 text-white p-4 text-3xl font-thin">
+      {/* Navigation bar container */}
       <div className="flex justify-between items-center">
-        <ul className="flex space-x-4">
+        {/* Navigation items */}
+        <ul className="flex space-x-4 text-lg md:text-2xl lg:text-3xl">
+          {/* Mapping over navbarItems */}
           {navbarItems.map((item) => (
+            // Render the item only if its path is not equal to the current location pathname
             item.path !== location.pathname && (
               <li key={item.path}>
+                {/* Render a link for each item */}
                 <Link to={item.path} className="hover:text-gray-300">{item.label}</Link>
               </li>
             )
           ))}
         </ul>
+        {/* User dropdown */}
         <div className="relative">
-          <span
-            className="text-gray-300 mr-2 cursor-pointer"
-            onClick={handleEmailClick}
-          >
+          {/* Display user email */}
+          <span className="text-gray-300 mr-2 cursor-pointer" onClick={handleEmailClick}>
             {userEmail}
           </span>
+          {/* Display dropdown if isDropdownVisible is true */}
           {isDropdownVisible && (
             <div
               className="absolute right-0 mt-2 bg-white text-gray-800 py-2 px-4 rounded shadow"
               ref={dropdownRef}
             >
-          <button type="button" onClick={() => logout}
-            className="message-button bg-red-800 hover:bg-red-700"
-          > logout
-          </button>
-              
+              {/* Logout button */}
+              <button className="bg-white text-gray font-bold py-1 px-1 rounded" onClick={logstuff}>
+                Logout
+              </button>
             </div>
           )}
         </div>

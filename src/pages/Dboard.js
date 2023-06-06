@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Link, useNavigate } from "react-router-dom";
 import "./Dboard.css";
@@ -13,8 +13,9 @@ import { OptimizeCosts } from './GreedyAlgorithm.js'
 import {AiOutlineCloseCircle} from 'react-icons/ai';
 import Modal from 'react-modal';
 import Select from 'react-select';
-import { docs, updateDoc } from 'firebase/firestore';
+import { docs, updateDoc, doc, setDoc } from 'firebase/firestore';
 import Navbar from './Navbar';
+import Chart from 'chart.js/auto';
 
 function Dboard() {
   const [user, loading] = useAuthState(auth);
@@ -27,7 +28,9 @@ function Dboard() {
   const navigate = useNavigate();
   const [closing, setClosing] = useState(false);
   const [formValid, setFormValid] = useState(false);
-
+  const [refreshCounter, setRefreshCounter] = useState(0);
+  const [buttonFix,setButtonFix] = useState(false);
+  const [buttonCounter,setButtonCounter] = useState(0);
   const location = useLocation();
   const currGroupName = location.state && location.state.currGroupName;
   console.log("The current group name is " + currGroupName);
@@ -39,6 +42,10 @@ function Dboard() {
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState([]);
+
+  const chartRef = useRef(null);
+  const [gotGraph, setGotGraph] = useState(false);
+  const [startGraph, setStartGraph] = useState(false);
 
   const allUsers = groupUsers.map(name => {
     return {
@@ -109,11 +116,87 @@ function Dboard() {
 
       const docRef = await addDoc(collection(db, "Event"), dataToBeFed);
       setEventFound(false);
+      setGotGraph(false);
+
       
     } catch (err) {
       console.error("Error adding document: ", err);
     }
   };
+
+  const generateChart = (inin) => {
+    console.log("The percentages rn is ", inin);
+    console.log("Label set is", inin.map((item) => item.payer));
+    const chartContainer = document.querySelector('.chart-container');
+    if (chartContainer) {
+      if (chartRef.current.chart) {
+        chartRef.current.chart.destroy();
+      }
+      const ctx = chartRef.current.getContext('2d');
+      chartRef.current.chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: inin.map((item) => item.payer),
+          datasets: [
+            {
+              label: 'Percentage of Total Payments',
+              data: inin.map((item) => item.percent),
+              backgroundColor: ['#ff6384', '#36a2eb', '#ffce56'],
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              max: 100,
+              beginAtZero: true,
+              ticks: {
+                stepSize: 20,
+              },
+            },
+          }
+        },
+      });
+    }
+  };
+
+  const getPercentages = (input) => {
+
+    const nameCounts = {};
+    let totalAmount = 0;
+    if(input.length > 0){
+
+    
+    
+    totalAmount = input.reduce(
+      (total, event) => total + parseInt(event.amountPaid, 10), 0
+    );
+    console.log("Total amount is", totalAmount);
+    input.forEach((event) => {
+      const {payer, amountPaid } = event;
+      const intPaid = parseInt(amountPaid, 10);
+      if(!nameCounts[payer]){
+        nameCounts[payer] = intPaid;
+      }
+      else{
+        nameCounts[payer] += intPaid;
+      }
+    });
+  }
+    const calculated = groupUsers.map((user) => ({
+        payer: user,
+        percent: (nameCounts[user] || 0) / totalAmount * 100,
+    }));
+  
+
+    console.log("About to set calculated to", calculated);
+
+    return calculated;
+  };
+
 
   const openModal = () => {
     setModalIsOpen(true);
@@ -223,9 +306,21 @@ function Dboard() {
   };
 
   const uploadEdgesToFirebase = async() =>{
-    const inputGraph = await graphStuff();
+    if(groupUsers.length < 2){
+      alert("Need at least 2 members in a group");
+      return;
+    }
+    let inputGraph;
+    try{
+      inputGraph = await graphStuff();
+    }
+    catch( err ){
+      alert("Error: Trip already finalized, or no valid (non-self) payments yet.");
+      return;
+    }
     console.log("Input graph has ", inputGraph);
-    if(getGraphFromFirebase() === true){
+    if(getGraphFromFirebase() === true)
+    {
       return;
     }
     const edges = inputGraph;
@@ -242,10 +337,14 @@ function Dboard() {
     const dataToBeFed = {groupName,sources,destinations,weights,payStatus};
 
     try {
-      const docRef = await addDoc(collection(db, "Splitpay"), dataToBeFed);
+      
+      const docRef = doc(db, "Splitpay", groupName);
+      await setDoc(docRef,dataToBeFed);
+
     } catch (err) {
-      console.error("Error adding document: ", err);
+      alert("Error adding document: ", err);
     }
+    alert("Trip has been finalized. Please check inbox for any payments.");
 
   };
 
@@ -270,6 +369,7 @@ function Dboard() {
 
   const fetchUserName = async () => {
     try {
+      console.log("TRYnNA FETCH");
       const q = query(collection(db, "users"), where("uid", "==", user?.uid));
       const doc = await getDocs(q);
       const data = doc.docs[0].data();
@@ -284,6 +384,7 @@ function Dboard() {
 
   const getSomeGroup = async (paramGroup) => {
     try {
+      console.log("TRYNNA GET A GR")
       const quer = await query(collection(db, "Groups"), where("name", "==", paramGroup));
       const docs = await getDocs(quer);
       const data = docs.docs[0].data();
@@ -291,11 +392,16 @@ function Dboard() {
       setGroupUsers(data.users);
       const eq = await query(collection(db, "Event"), where("groupName", "==", groupName));
       const eventDoc = await getDocs(eq);
+
+      var num = refreshCounter;
+      if(!eventDoc.metadata.hasPendingWrites){
+        num += 1;
+        setRefreshCounter(num);
+      }
       
       if(!eventDoc.empty){
         setEventFound(true);
         setEmptyList(false);
-
       }
       else{
         const ss = eventDoc.size;
@@ -313,9 +419,16 @@ function Dboard() {
           else{
             console.log("Set emptyList to false");
             setEmptyList(false);
+            setGotGraph(true);
           }
           setEventFound(true);
         }
+        if(num > 30){
+          console.log("JUST STOPPED");
+          setEmptyList(true);
+          setEventFound(true);
+        }
+
       }
 
         const eventDatabase = [];
@@ -330,6 +443,7 @@ function Dboard() {
           eventDatabase.push(newEventInformation);
         });
         setEventInfo(eventDatabase);
+        setStartGraph(true);
     
       // console.log(eventInfo[0].date); // Access the updated state
       // console.log(eventInfo[1].date); // Access the sd state
@@ -348,6 +462,7 @@ function Dboard() {
     // function getDebtors(allNames,payerName){
     //   return allNames.filter(item => item !== payerName);
     // }
+
     eventInfo.forEach(ev =>{
       console.log("ATENDEES ARE ",ev.atendees);
       const debts = ev.atendees;
@@ -417,6 +532,23 @@ function Dboard() {
       getSomeGroup(currGroupName);
       console.log("INFINITE LOOP");
     }
+    const temp = eventInfo;
+    console.log("Right now temp has ", temp);
+    if(startGraph && temp.length > 0 && !gotGraph){
+      
+      console.log("SHOULD BE WORKING!!!");
+      const vals = getPercentages(temp);
+      generateChart(vals);
+      setGotGraph(true);
+    }
+    else if(eventFound && !gotGraph && emptyList){
+
+    }
+    var balTotal = 0;
+    pastPayments.payments.forEach(pay =>{
+      balTotal = balTotal + parseFloat(pay.amount);  
+    });
+    setBalance(balTotal);
     if(readyToUpload){
       console.log("final graph edges are",finalGraphEdges);
       //uploadEdgesToFirebase(finalGraphEdges);
@@ -443,7 +575,7 @@ function Dboard() {
       console.log("Your username is " + name);
     console.log("Your groupname is ", groupName);
 
-  }, [user, loading, navigate, fetchUserName,emptyList]);
+  }, [user, loading, navigate, fetchUserName,emptyList, gotGraph]);
 const people = [
   {
     name: 'Jane Cooper',
@@ -471,6 +603,9 @@ const people = [
   },
   // More people...
 ];
+
+
+
 return (
   <div id="inbox" className="bg-gray-900 text-white">
   <Navbar userEmail={user?.email}/>
@@ -479,7 +614,7 @@ return (
       <div className="flex items-center justify-between">
         <div className="flex items-center">
         <button className="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg mr-4" type="button" onClick={() => uploadEdgesToFirebase()}>
-            Upload Payments
+            Finalize Trip
           </button>
         </div>
       </div>
@@ -490,13 +625,15 @@ return (
         {currGroupName}'s Trip Receipt
       </div>
       <div className="text-white text-2xl mb-6">Recent Group Payments</div>
-      <div className="table-wrapper">
-      <table className="table-auto w-5/6 text-white mb-6">
+<div className="flex">
+      <div className="flex items-center justify-between bg-gray-300 rounded-lg p-6 w-2/5 shadow-md ">
+
+      <table className="table-fixed w-full text-black mb-6 mt-6 ml-9">
   <tbody>
     <tr>
-      <td className="w-5/4 p-6">Date</td>
+      <td className="w-5/4 p-6 whitespace-nowrap overflow-hidden overflow-ellipsis border border-black border-solid border-2 font-semibold">Date</td>
       {pastPayments.payments.map((item, i) => (
-        <td key={i} className="w-5/4 p-6 whitespace-nowrap overflow-hidden overflow-ellipsis">
+        <td key={i} className="w-5/4 p-6 whitespace-nowrap overflow-hidden overflow-ellipsis border border-black border-solid border-2">
           {new Date(item.date).toLocaleDateString([], {
             month: 'short',
             day: 'numeric',
@@ -505,25 +642,25 @@ return (
       ))}
     </tr>
     <tr>
-      <td className="w-5/4 p-6">Payer</td>
+      <td className="w-5/4 p-6 whitespace-nowrap overflow-hidden overflow-ellipsis border border-black border-solid border-2 font-semibold">Payer</td>
       {pastPayments.payments.map((item, i) => (
-        <td key={i} className="w-5/4 p-6 whitespace-nowrap overflow-hidden overflow-ellipsis">
+        <td key={i} className="w-5/4 p-6 whitespace-nowrap overflow-hidden overflow-ellipsis border border-black border-solid border-2">
           {item.payer}
         </td>
       ))}
     </tr>
     <tr>
-      <td className="w-5/4 p-6">Place</td>
+      <td className="w-5/4 p-6 whitespace-nowrap overflow-hidden overflow-ellipsis border border-black border-solid border-2 font-semibold">Place</td>
       {pastPayments.payments.map((item, i) => (
-        <td key={i} className="w-5/4 p-6 whitespace-nowrap overflow-hidden overflow-ellipsis">
+        <td key={i} className="w-5/4 p-6 whitespace-nowrap overflow-hidden overflow-ellipsis border border-black border-solid border-2">
           {item.place}
         </td>
       ))}
     </tr>
     <tr>
-      <td className="w-5/4 p-6">Amount</td>
+      <td className="w-5/4 p-6 whitespace-nowrap overflow-hidden overflow-ellipsis border border-black border-solid border-2 font-semibold">Amount</td>
       {pastPayments.payments.map((item, i) => (
-        <td key={i} className="w-5/4 p-6 whitespace-nowrap overflow-hidden overflow-ellipsis">
+        <td key={i} className="w-5/4 p-6 whitespace-nowrap overflow-hidden overflow-ellipsis border border-black border-solid border-2">
           ${item.amount}
         </td>
       ))}
@@ -531,14 +668,14 @@ return (
     {/* Add more table rows as needed */}
   </tbody>
 </table>
-
-
-
-
+</div>
+<div className="chart-container h-auto">
+  <canvas ref={chartRef}></canvas>  
+</div>
 </div>
 
-      <p className="text-white text-xl mb-6">
-        Remaining balance: ${balance}
+      <p className="text-white text-xl mb-6 mt-6">
+        Total Expenditure of the Trip: ${balance}
       </p>
       <div className="text-white text-2xl mb-6">Enter a new Payment</div>
       <div className="flex items-center justify-between mb-6">
@@ -628,8 +765,8 @@ return (
             name="place"
             value={paymentValues.place}
             onChange={handleChange}
-            placeholder=""
-            className="w-full py-2 px-4 mb-4 rounded-lg"
+            placeholder="Location:"
+            className="placeholder-opacity-50 placeholder-gray-400 w-full py-2 px-4 mb-4 rounded-lg"
           />
           <br />
           <input
@@ -637,8 +774,8 @@ return (
             name="description"
             value={paymentValues.description}
             onChange={handleChange}
-            placeholder=""
-            className="w-full py-2 px-4 mb-4 rounded-lg"
+            placeholder="Additional Notes:"
+            className="placeholder-opacity-50 placeholder-gray-400 w-full py-2 px-4 mb-4 rounded-lg"
           />
         </div>
         <br />
@@ -660,6 +797,120 @@ return (
   </div>
   </div>
 );
+
+/*
+    <Modal
+      isOpen={modalIsOpen}
+      onRequestClose={closeModal}
+      className="modal"
+      overlayClassName="overlay"
+    >
+      <h2 className="text-4xl font-semibold mb-6">Payment Form</h2>
+      <form className="formStyle" onSubmit={handleSubmit}>
+        <button
+          className="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg absolute right-4 top-4"
+          onClick={handleClose}
+        >
+          <AiOutlineCloseCircle size={48} />
+        </button>
+        <p className="text-xl mb-2">Price*</p>
+        <input
+          className="w-full py-2 px-4 mb-4 rounded-lg"
+          type="number"
+          name="totalPrice"
+          value={paymentValues.totalPrice}
+          onChange={handleChange}
+        />
+        <p className="text-xl mb-2">Members of Group*</p>
+        <Select
+          isMulti={true}
+          value={selectedUsers}
+          options={allUsers}
+          onChange={handleSelect}
+        />
+        <br />
+        <div className="flex justify-between">
+          <button
+            type="button"
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mb-4"
+            onClick={handleSelectAll}
+          >
+            Select All
+          </button>
+          <button
+            type="button"
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mb-4"
+            onClick={handleDeselectAll}
+          >
+            Deselect All
+          </button>
+        </div>
+        <p className="text-xl mb-2">Payer*</p>
+        <select
+          name="personPaid"
+          value={paymentValues.personPaid}
+          className="w-full py-2 px-4 mb-4 rounded-lg"
+          onChange={handleChange}
+        >
+          <option value="select">Select</option>
+          {selectedUsers.map((user) => (
+            <option key={user.label} value={user.label}>
+              {user.label}
+            </option>
+          ))}
+        </select>
+        <p className="text-xl mb-2">Additional Info</p>
+        <div className="extraInfo">
+          <input
+            type="date"
+            name="date"
+            value={paymentValues.date}
+            onChange={handleChange}
+            className="w-full py-2 px-4 mb-4 rounded-lg"
+            pattern="^[0-9]*//*[0-9]*$"
+            />
+            <br />
+            <input
+              type="text"
+              name="place"
+              value={paymentValues.place}
+              onChange={handleChange}
+              placeholder="Activity name:"
+              className="placeholder-opacity-50 placeholder-gray-400 w-full py-2 px-4 mb-4 rounded-lg"
+            />
+            <br />
+            <input
+              type="text"
+              name="description"
+              value={paymentValues.description}
+              onChange={handleChange}
+              placeholder="Additional Notes:"
+              className="placeholder-opacity-50 placeholder-gray-400 w-full py-2 px-4 mb-4 rounded-lg"
+            />
+          </div>
+          <br />
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
+          >
+            Submit
+          </button>
+          <br />
+          <button
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
+            onClick={handleClose}
+          >
+            Close
+          </button>
+        </form>
+      </Modal>
+
+*/
+
+
+
+
+
 
 //This is the OG imeplementation, dont delete
 //   return (

@@ -20,11 +20,13 @@ export default function GroupSelection(){
   const [groupName, setGroupName] = useState("");
   const [paidOffStatus, setPaidOffStatus] = useState(true);
   const [gotGroups, setgotGroups] = useState(false);
+  const [refreshCounter, setRefreshCounter] = useState(0);
 
   const navigate = useNavigate();
 
   const fetchUserName = async () => {
     try {
+      console.log("TRYNNA FETCH USER");
       const q = query(collection(db, "users"), where("uid", "==", user?.uid));
       const doc = await getDocs(q);
       const data = doc.docs[0].data();
@@ -39,25 +41,25 @@ export default function GroupSelection(){
 
   const getGroupsForUser = async (name) => {
     try{
+      console.log("TRYNNA GET THE GRUOP");
         console.log("Called function");
       const quer = await query(collection(db,"Groups"),where("users", "array-contains", name));
       const querySnapshot = await getDocs(quer);
+      var num = refreshCounter;
+      if(!querySnapshot.metadata.hasPendingWrites){
+        num += 1;
+        setRefreshCounter(num);
+      }
+      
+      
       if(querySnapshot.empty === false){
         setgotGroups(true);
       }
-      else{
-          const sz = querySnapshot.docs.size;
-          console.log("sz is ",sz);
-          console.log("Query should have ended");
-          if(typeof(sz) === "undefined"){
-            console.log("Undefined, trying again");
-          }
-          else{
-            console.log("Its true; not undefined");
+      else{          //THIS IS CAUSING AN INFINITE LOOP FOR A PERSON NOT IN A GROUP
+          if(num > 30){
+            console.log("JUST STOPPED");
             setgotGroups(true);
           }
-          
-        
       }
       const groupList = querySnapshot.docs.map((doc) => {
         const groupData = doc.data();
@@ -232,4 +234,3 @@ export default function GroupSelection(){
 
 
 }
-

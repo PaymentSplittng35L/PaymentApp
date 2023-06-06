@@ -226,6 +226,7 @@ export default function Inbox() {
           if (loading) return;
           if (!user) return navigate("/");
           if(!fetchOnce && gotUser){
+            console.log("POTENTIAL LOOP EXISTS");
             const retlist2 = await getInboxFromFirebase(name);
             setRetList(retlist2)
             const retlistb2 = await getSecondInboxFromFirebase(name);
@@ -290,6 +291,10 @@ export default function Inbox() {
     function handleClick(message) {
       // Increment the click count for the button
       console.log("Clicked on ", message.name);
+      if(message.buttonText === "Pending Confirmation"){
+        console.log("Returned");
+        return;
+      }
       firebaseClickHandle(name, message.name, message.amount, message.group);
       // Update the state
       //setMessages(messages);
@@ -297,7 +302,10 @@ export default function Inbox() {
       
     }
     function handleClick2(receipt) {
-      if(receipt[3] === false){
+      console.log(receipt);
+      console.log("Function being called");
+      console.log("The value is", receipt[3]);
+      if(receipt.buttonText === "Waiting for Payment"){
         console.log("Returned");
         return;
       }
@@ -309,81 +317,120 @@ export default function Inbox() {
     
 
 
-    
-    // return (
 
-    //   <div id="inbox" className="bg-gray-900 text-white">
-    //     <Navbar userEmail={user?.email}/>
-    //     <p className="text-center text-5xl">Inbox Page</p>
-    //     <div className="flex justify-center">
-    //       <div className="w-1/2">
-    //         <h1 className="text-2xl font-bold mb-4">Who you owe</h1>
-    //         {messages.map((message, index) => (
-    //           <div key={index} className="message">
-    //             <span>
-    //               Pay ${message.amount} to <b>{message.name}</b>?
-    //             </span> 
-    //             <button type="button" onClick= {() => handleClick(message)} className="btn btn-primary bg-red-800 hover:bg-red-700 text-white rounded">{message.buttonText}</button>
-    //           </div>
-    //         ))}
-    //       </div>
-    //       <div className="w-1/2">
-    //         <h1 className="text-2xl font-bold mb-4">Who owes you</h1>
-    //         {receipts.map((receipt, index2) => (
-    //           <div key={index2} className="message">
-    //             <span>
-    //               {receipt.name} paid you ${receipt.amount}?
-    //             </span>
-    //             <button type="button" onClick= {() => handleClick2(receipt)} className="btn btn-primary bg-red-800 hover:bg-red-700 text-white rounded">{receipt.buttonText}</button>
-    //           </div>
-    //         ))}
-    //       </div>
-    //     </div>
-    //   </div>
-    // );
+// return(
+// <div id="inbox" className="bg-gray-900 text-white">
+//   <Navbar userEmail={user?.email} />
+//   <p className="text-center text-5xl">Inbox Page</p>
+//   <div className="flex justify-center">
+//     <div className="w-1/2">
+//       <h1 className="text-2xl font-bold mb-4">Who you owe</h1>
+//       {messages.map((message, index) => (
+//         <div key={index} className="message-box">
+//           <span className="message-text">
+//             Pay ${message.amount} to <b>{message.name}</b>?
+//           </span>
+//           <button
+//             type="button"
+//             onClick={() => handleClick(message)}
+//             className="message-button bg-red-800 hover:bg-red-700"
+//           >
+//             {message.buttonText}
+//           </button>
+//         </div>
+//       ))}
+//     </div>
+//     <div className="w-1/2">
+//       <h1 className="text-2xl font-bold mb-4">Who owes you</h1>
+//       {receipts.map((receipt, index2) => (
+//         <div key={index2} className="message-box">
+//           <span className="message-text">
+//             {receipt.name} paid you ${receipt.amount}?
+//           </span>
+//           <button
+//             type="button"
+//             onClick={() => handleClick2(receipt)}
+//             className="message-button bg-green-800 hover:bg-green-700"
+//           >
+//             {receipt.buttonText}
+//           </button>
+//         </div>
+//       ))}
+//     </div>
+//   </div>
+// </div>
+// );
 
-return(
-<div id="inbox" className="bg-gray-900 text-white">
-  <Navbar userEmail={user?.email} />
-  <p className="text-center text-5xl">Inbox Page</p>
-  <div className="flex justify-center">
-    <div className="w-1/2">
-      <h1 className="text-2xl font-bold mb-4">Who you owe</h1>
-      {messages.map((message, index) => (
-        <div key={index} className="message-box">
-          <span className="message-text">
-            Pay ${message.amount} to <b>{message.name}</b>?
-          </span>
-          <button
-            type="button"
-            onClick={() => handleClick(message)}
-            className="message-button bg-red-800 hover:bg-red-700"
-          >
-            {message.buttonText}
-          </button>
-        </div>
-      ))}
+
+return (
+  <div id="inbox" className="bg-gray-900 text-white h-screen">
+    <Navbar userEmail={user?.email} />
+    <p className="text-center text-5xl">Inbox:</p>
+    <div className="flex justify-center">
+      <div className="w-1/2">
+        <h1 className="text-2xl font-bold mb-4">Pay Your Friends:</h1>
+        {messages.map((message, index) => (
+          <div key={index} className="message-box">
+            <div className="message-content">
+              <span className="message-text">
+                Send ${message.amount.toFixed(2)} to <b>{message.name}</b>
+              </span>
+              <button
+                type="button"
+                onClick={() => handleClick(message)}
+                className="message-button bg-red-800 hover:bg-red-700"
+              >
+                {message.buttonText}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="w-1/2">
+        <h1 className="text-2xl font-bold mb-4">Your Friends Paid You:</h1>
+        {receipts.map((receipt, index2) => (
+          <div key={index2} className="message-box">
+            <div className="message-content">
+              <span className="message-text">
+                {receipt.name} has sent you ${receipt.amount.toFixed(2)}
+              </span>
+              <button
+                type="button"
+                onClick={() => handleClick2(receipt)}
+                className="message-button bg-green-800 hover:bg-green-700"
+              >
+                {receipt.buttonText}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
-    <div className="w-1/2">
-      <h1 className="text-2xl font-bold mb-4">Who owes you</h1>
-      {receipts.map((receipt, index2) => (
-        <div key={index2} className="message-box">
-          <span className="message-text">
-            {receipt.name} paid you ${receipt.amount}?
-          </span>
-          <button
-            type="button"
-            onClick={() => handleClick2(receipt)}
-            className="message-button bg-green-800 hover:bg-green-700"
-          >
-            {receipt.buttonText}
-          </button>
-        </div>
-      ))}
-    </div>
+    <style jsx>{`
+      .message-box {
+        background-color: #333;
+        padding: 10px;
+        margin-bottom: 10px;
+      }
+      .message-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .message-text {
+        color: #fff;
+      }
+      .message-button {
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 4px;
+      }
+    `}</style>
   </div>
-</div>
 );
+
+
+
                 
   }
   

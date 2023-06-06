@@ -92,6 +92,8 @@ const NewGroup = () => {
     //     peopleAttending: ["sample atendee"]
     // });
     setGroupName('');
+    //navigate('/dashboard')
+    navigate('/GroupSelection')
   };
   //this is for joining groups
   const joinGroupSubmit = async (event) => {
@@ -125,60 +127,72 @@ const NewGroup = () => {
     else{
       console.log("Error; group doesnt exists");
       alert("Group does not exist");
+      return;
     }
   
     setGroupName2('');
+    navigate('/GroupSelection')
   };
-  
+  /*
+
+*/
 
   return (
-    <div id="inbox" className="bg-gray-900 text-white">
-    <Navbar userEmail={user?.email}/>
-    <div>
-      <h1>Create Group</h1>
-      <div>
-      </div>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="group-name">Group Name:</label>
-          <input
-            type="text"
-            id="group-name"
-            value={groupName}
-            onChange={handleGroupNameChange}
-          />
-        </div>
-        <button type="submit">Create Group</button>
-      </form>
-    </div>
+ <>   
+ <Navbar userEmail={user?.email} />
+<div id="inbox" className="space-y-8 bg-gray-900 text-white min-h-screen flex flex-col justify-center items-center">
+  <div className="container mx-auto max-w-md p-8 bg-gray-800 rounded-md shadow-lg">
+    <h1 className="text-3xl font-bold mb-6 text-white">Create Group</h1>
+    <form onSubmit={handleSubmit}>
+      <div className="mb-6">
+        <label htmlFor="group-name" className="block text-gray-300 font-bold mb-2">Group Name:</label>
+        <input
+          type="text"
+          id="group-name"
+          value={groupName}
+          onChange={handleGroupNameChange}
+          placeholder="Enter Group Name:"
 
-
-    <div>
-      <h1>Join Group</h1>
-      <div>
-        <p>Enter Join Code:</p>
+          className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-blue-500"
+        />
       </div>
-      <form onSubmit={joinGroupSubmit}>
-        <div>
-          <label htmlFor="group-name">Group Name:</label>
-          <input
-            type="text"
-            id="group-name"
-            value={joinGroupName}
-            onChange={handleGroupNameChange2}
+      <button
+        type="submit"
+        className="placeholder-opacity-50 placeholder-gray-400 w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none"
+      >
+        Create Group
+      </button>
+    </form>
+  </div>
+  
+  <div className="container mx-auto max-w-md p-8 bg-gray-800 rounded-lg shadow-xl">
+    <h1 className="text-3xl font-bold mb-6 text-white">Join Group</h1>
+
+    <form onSubmit={joinGroupSubmit}>
+      <div className="mb-6">
+        <label htmlFor="group-name" className="block text-gray-300 font-bold mb-2">Group Name:</label>
+        <input
+          type="text"
+          id="group-name"
+          value={joinGroupName}
+          onChange={handleGroupNameChange2}
+          placeholder="Enter Group Name:"
+          className="placeholder-opacity-50 placeholder-gray-400 w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-blue-500"
           />
-        </div>
-        <button type="submit">Join Group</button>
-      </form>
-    
-    </div>
-    </div>
+      </div>
+      <button
+        type="submit"
+        className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none"
+      >
+        Join Group
+      </button>
+    </form>
+  </div>
+</div>
+
+    </>
   );
 };
-
-
-
-
 
 
 export default NewGroup;
