@@ -76,6 +76,11 @@ const NewGroup = () => {
       return;
     }
 
+    if(groupName.length < 1){
+      alert("Can not create group with no name");
+      return;
+    }
+
     await addDoc(collection(db, "Groups"), {
         name: groupName,
         users: [name],

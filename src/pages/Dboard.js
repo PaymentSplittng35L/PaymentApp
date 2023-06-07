@@ -231,6 +231,7 @@ function Dboard() {
   }
 
   const handleOpening = () => {
+    setClosing(false);
     clearForm();
     openModal();
   }
