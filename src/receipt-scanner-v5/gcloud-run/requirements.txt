@@ -1,0 +1,6 @@
+pytesseract
+opencv-python-headless
+matplotlib
+numpy
+pillow
+Flask
