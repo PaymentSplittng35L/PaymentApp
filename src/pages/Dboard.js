@@ -41,6 +41,8 @@ function Dboard() {
   const [graphObjectMake, setGraphObjectMake] = useState(true);
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [modalIsOpenAI, setModalIsOpenAI] = useState(false);
+  const [totalPriceAI, setTotalPriceAI] = useState('');
   const [selectedUsers, setSelectedUsers] = useState([]);
 
   const chartRef = useRef(null);
@@ -74,6 +76,40 @@ function Dboard() {
     // Check if any required field is empty
     if (!totalPrice || !selectedUsers || !date || !place || !personPaid || !description) {
       if(!totalPrice){
+        alert("totalprice not there!");
+      }
+      if(!selectedUsers){
+        alert("selected users not there!")
+      }
+     
+      if(!date){
+        alert("No description");
+      }
+      if(!place){
+        alert("No place");
+      }
+      if(!personPaid){
+        alert("No personPaid");
+      }
+      if(!description){
+        alert("No description");
+      }
+      return false;
+    }
+    if(personPaid === "select"){
+      return false;
+    }
+  
+    return true;
+  };
+
+
+  const validateFormAI = () => {
+    const { totalPrice, personPaid, place, date, description} = paymentValues;
+  
+    // Check if any required field is empty
+    if (!totalPriceAI || !selectedUsers || !date || !place || !personPaid || !description) {
+      if(!totalPriceAI){
         alert("totalprice not there!");
       }
       if(!selectedUsers){
@@ -206,6 +242,14 @@ function Dboard() {
     setModalIsOpen(false);
   };
 
+  const openModalAI = () => {
+    setModalIsOpenAI(true);
+  };
+
+  const closeModalAI = () => {
+    setModalIsOpenAI(false);
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setPaymentValues((prevValues) => ({
@@ -235,6 +279,11 @@ function Dboard() {
     openModal();
   }
 
+  const handleOpeningAI = () => {
+    clearForm();
+    openModalAI();
+  }
+
 
 
   const handleSubmit = (e) => {
@@ -252,9 +301,33 @@ function Dboard() {
     addDocument(paymentValues.date,paymentValues.place,paymentValues.totalPrice,currGroupName,paymentValues.description,[paymentValues.personPaid], selectedUsersName);
     console.log("f TO DOC SOMEHOW");
     closeModal();
+    
     }
     else{
       closeModal();
+      
+      setClosing(false);
+    }
+  };
+
+  const handleSubmitAI = (e) => {
+    e.preventDefault();
+    if(modalIsOpenAI && !closing){
+      if (!validateFormAI()) { //fix this
+        alert('Please fill in all required fields.');
+        return;
+      }
+
+    // Call your function here with paymentValues
+    console.log("About to process these values");
+    console.log("Selected users are", selectedUsers); //can access group of everyone who paid
+    const selectedUsersName = selectedUsers.map((user) => user.label); //can do user.value to get unique UID for each person, etc.
+    addDocument(paymentValues.date,paymentValues.place,totalPriceAI,currGroupName,paymentValues.description,[paymentValues.personPaid], selectedUsersName);
+    console.log("f TO DOC SOMEHOW");
+    closeModalAI();
+    }
+    else{
+      closeModalAI();
       setClosing(false);
     }
   };
@@ -270,6 +343,13 @@ function Dboard() {
   const handleClose = (e) => {
     setClosing(true);
     closeModal();
+    console.log("Tried to close");
+    
+  }
+
+  const handleCloseAI = (e) => {
+    setClosing(true);
+    closeModalAI();
     console.log("Tried to close");
     
   }
@@ -576,33 +656,55 @@ function Dboard() {
     console.log("Your groupname is ", groupName);
 
   }, [user, loading, navigate, fetchUserName,emptyList, gotGraph]);
-const people = [
-  {
-    name: 'Jane Cooper',
-    title: 'Regional Paradigm Technician',
-    department: 'Optimization',
-    role: 'Admin',
-    email: 'jane.cooper@example.com',
-    image: 'https://bit.ly/33HnjK0',
-  },
-  {
-    name: 'John Doe',
-    title: 'Regional Paradigm Technician',
-    department: 'Optimization',
-    role: 'Tester',
-    email: 'john.doe@example.com',
-    image: 'https://bit.ly/3I9nL2D',
-  },
-  {
-    name: 'Veronica Lodge',
-    title: 'Regional Paradigm Technician',
-    department: 'Optimization',
-    role: ' Software Engineer',
-    email: 'veronica.lodge@example.com',
-    image: 'https://bit.ly/3vaOTe1',
-  },
-  // More people...
-];
+
+
+
+
+
+
+
+const [selectedFile, setSelectedFile] = useState(null);
+const handleFileSelect = (event) => {
+  setSelectedFile(event.target.files[0]);
+};
+  
+
+const handleButtonPress = async () => {
+  // try {
+  //   setTotalPriceAI('5');
+  // } catch (error) {
+  //   alert("big fuck");
+  // }
+  
+  
+  try {
+    const formData = new FormData();
+    formData.append('image', selectedFile);
+
+    const response = await fetch('https://us-central1-func-test-389018.cloudfunctions.net/git-function', {
+      method: 'POST',
+      body: formData,
+    });
+    const totalPriceFromResponse = await response.json();
+
+    // Update the state or variable with the retrieved value
+    setTotalPriceAI(totalPriceFromResponse);
+  } catch (error) {
+    alert("oops, total price:", totalPriceAI)
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -679,16 +781,156 @@ return (
       </p>
       <div className="text-white text-2xl mb-6">Enter a new Payment</div>
       <div className="flex items-center justify-between mb-6">
-        <div className="text-white">
+        
+        <div className="text-white" onClick = {handleOpeningAI}>
           <p>Scan a receipt</p>
           <MdOutlineDocumentScanner size={48} />
         </div>
+
+
         <div className="text-white" onClick={handleOpening}>
           <p>Manual Input</p>
           <ImListNumbered size={40} />
         </div>
       </div>
     </div>
+
+
+
+
+
+    <Modal
+      isOpen={modalIsOpenAI}
+      onRequestClose={closeModalAI}
+      className="modal"
+      overlayClassName="overlay"
+    >
+      <h2 className="text-4xl font-semibold mb-6">Payment Form</h2>
+      <form className="formStyle" onSubmit={handleSubmitAI}>
+
+        
+        <button
+          className="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg absolute right-4 top-4"
+          onClick={handleCloseAI}
+        >
+          <AiOutlineCloseCircle size={48} />
+        </button>
+
+
+
+
+
+        <p className="text-xl mb-2">Price*</p>
+
+        <div>
+      <input
+        className="w-full py-2 px-4 mb-4 rounded-lg"
+        type="file"
+        accept="image/*"
+        onChange={handleFileSelect}
+      />
+      <div>      
+      <button
+            type="button"
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mb-4"
+            onClick={handleButtonPress}
+          >
+Upload and Set Value          </button>    </div>
+    
+
+
+    </div>
+
+
+        <p className="text-xl mb-2">Members of Group*</p>
+        <Select
+          isMulti={true}
+          value={selectedUsers}
+          options={allUsers}
+          onChange={handleSelect}
+        />
+        <br />
+        <div className="flex justify-between">
+          <button
+            type="button"
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mb-4"
+            onClick={handleSelectAll}
+          >
+            Select All
+          </button>
+          <button
+            type="button"
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mb-4"
+            onClick={handleDeselectAll}
+          >
+            Deselect All
+          </button>
+        </div>
+        <p className="text-xl mb-2">Payer*</p>
+        <select
+          name="personPaid"
+          value={paymentValues.personPaid}
+          className="w-full py-2 px-4 mb-4 rounded-lg"
+          onChange={handleChange}
+        >
+          <option value="select">Select</option>
+          {selectedUsers.map((user) => (
+            <option key={user.label} value={user.label}>
+              {user.label}
+            </option>
+          ))}
+        </select>
+        <p className="text-xl mb-2">Additional Info</p>
+        <div className="extraInfo">
+          <input
+            type="date"
+            name="date"
+            value={paymentValues.date}
+            onChange={handleChange}
+            className="w-full py-2 px-4 mb-4 rounded-lg"
+            pattern="^[0-9]*/[0-9]*$"
+          />
+          <br />
+          <input
+            type="text"
+            name="place"
+            value={paymentValues.place}
+            onChange={handleChange}
+            placeholder="Location:"
+            className="placeholder-opacity-50 placeholder-gray-400 w-full py-2 px-4 mb-4 rounded-lg"
+          />
+          <br />
+          <input
+            type="text"
+            name="description"
+            value={paymentValues.description}
+            onChange={handleChange}
+            placeholder="Additional Notes:"
+            className="placeholder-opacity-50 placeholder-gray-400 w-full py-2 px-4 mb-4 rounded-lg"
+          />
+        </div>
+        <br />
+        <button
+          type="submit"
+          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
+        >
+          Submit
+        </button>
+        <br />
+        <button
+          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
+          onClick={handleClose}
+        >
+          Close
+        </button>
+      </form>
+    </Modal>
+
+    
+
+
+
+
     <Modal
       isOpen={modalIsOpen}
       onRequestClose={closeModal}
@@ -794,6 +1036,23 @@ return (
         </button>
       </form>
     </Modal>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   </div>
   </div>
 );
