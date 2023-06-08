@@ -681,7 +681,7 @@ const handleButtonPress = async () => {
     const formData = new FormData();
     formData.append('image', selectedFile);
 
-    const response = await fetch('https://us-central1-func-test-389018.cloudfunctions.net/git-function', {
+    const response = await fetch('https://receipt-scanner-dctp3pim2q-uc.a.run.app/', {
       method: 'POST',
       body: formData,
     });
