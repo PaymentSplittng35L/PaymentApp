@@ -197,7 +197,7 @@ def helloFromGit():
     """
     file = request.files['image']
 
-    # Read the file data
+    # Read the file dataq
     image_data = file.read()
     nparr = np.frombuffer(image_data, np.uint8)
     image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
