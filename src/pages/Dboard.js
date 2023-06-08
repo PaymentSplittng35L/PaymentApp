@@ -259,6 +259,7 @@ function Dboard() {
     }));
   };
 
+
   const handleSelect = (selectedItems) => {
     setSelectedUsers(selectedItems);
   }
@@ -689,7 +690,11 @@ const handleButtonPress = async () => {
     const totalPriceFromResponse = await response.json();
 
     // Update the state or variable with the retrieved value
-    setTotalPriceAI(totalPriceFromResponse);
+    //setTotalPriceAI(totalPriceFromResponse);
+    setPaymentValues((prevPaymentValues) => ({
+      ...prevPaymentValues,
+      totalPrice: totalPriceFromResponse,
+    }));
     alert("BRO WE FUCKING DID IT", totalPriceAI);
   } catch (error) {
     alert("oops, total price:", error)
@@ -824,24 +829,7 @@ return (
 
         <p className="text-xl mb-2">Price*</p>
 
-        <div>
-      <input
-        className="w-full py-2 px-4 mb-4 rounded-lg"
-        type="file"
-        accept="image/*"
-        onChange={handleFileSelect}
-      />
-      <div>      
-      <button
-            type="button"
-            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mb-4"
-            onClick={handleButtonPress}
-          >
-Upload and Set Value          </button>    </div>
-    
-
-
-    </div>
+        
 
 
         <p className="text-xl mb-2">Members of Group*</p>
@@ -948,6 +936,29 @@ Upload and Set Value          </button>    </div>
           <AiOutlineCloseCircle size={48} />
         </button>
         <p className="text-xl mb-2">Price*</p>
+
+
+        <div>
+      <input
+        className="w-full py-2 px-4 mb-4 rounded-lg"
+        type="file"
+        accept="image/*"
+        onChange={handleFileSelect}
+      />
+      <div>      
+      <button
+            type="button"
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mb-4"
+            onClick={handleButtonPress}
+          >
+Upload and Set Value          </button>    </div>
+    
+
+
+    </div>
+
+
+
         <input
           className="w-full py-2 px-4 mb-4 rounded-lg"
           type="number"
