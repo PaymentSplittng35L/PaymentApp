@@ -1,10 +1,12 @@
 import {Node,Graph} from './Graph.js'
 class OptimizeCosts{
     constructor(inputGraph){
+        this.optimizerName = inputGraph.getGraphName();
         this.allEdges = [];
         inputGraph.getAllEdges().forEach(edge =>{
             this.allEdges.push(edge);
         });
+        console.log("All edges are ",this.allEdges);
         this.nameList = [];
         inputGraph.getAllNames().forEach(name =>{
             this.nameList.push(name);
@@ -28,7 +30,7 @@ class OptimizeCosts{
             var templist = [this.nameList[i],5];
             templist[1] -=5;
             deltalist.push(templist);
-            console.log("Just added element: ", deltalist);
+            console.log("Just added element: ", deltalist[i][1]);
         }
         //This look right? yeah
         //so u have to search for the righ tname in deltalist first right
@@ -63,8 +65,9 @@ class OptimizeCosts{
         this.allEdges.forEach(edge =>{
             var srcindex = deltalist.findIndex(([source, _]) => source === edge[0]);
             var dstindex = deltalist.findIndex(([dest, _]) => dest === edge[1]);
+            console.log("DEST INDEX IS",dstindex);
             console.log(dstindex);
-
+            
             console.log("Adding", edge[2], "to ", deltalist[srcindex][0])
             deltalist[srcindex][1] = deltalist[srcindex][1] + edge[2];
             deltalist[dstindex][1] = deltalist[dstindex][1] - edge[2];
@@ -159,7 +162,7 @@ class OptimizeCosts{
 
 
         //creating the new Graph
-        this.retGraph = new Graph("myretgraph",this.nameList);
+        this.retGraph = new Graph(this.optimizerName,this.nameList);
     this.retGraph.parseOptimization(fullList); 
         
     }

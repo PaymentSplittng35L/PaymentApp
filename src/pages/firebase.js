@@ -20,7 +20,15 @@ import {
     where,
     addDoc,
 } from "firebase/firestore";
-
+// const firebaseConfig = {
+//   apiKey: "AIzaSyBg0Tbdrf9a73P1_66An2GY_ZZZmhTQ0OI",
+//   authDomain: "myproject2-64909.firebaseapp.com",
+//   projectId: "myproject2-64909",
+//   storageBucket: "myproject2-64909.appspot.com",
+//   messagingSenderId: "1036775344211",
+//   appId: "1:1036775344211:web:7dbcf9191ea5fc760d1ea6",
+//   measurementId: "G-0ZPMBEJ23B"
+// };
 
 const firebaseConfig = {
     apiKey: "AIzaSyC_xdgN2q3UQm70g_tRi2ILynikrkCuhZg",

@@ -83,14 +83,26 @@ class Graph{
     //What this does is intializes a list called allEdges, then iterates through every node in the graph
     //And calls the getEdges method to get all edges that originate at that vertex in the form [src,dest,weight]
     //And then takes the list of all those edges and appends each edge to the allEdges list
-    
+    getGraphName(){
+        return this.name;
+    }
+    addAnEdge(src,dst,weight){
+        this.nodeList.forEach(node =>{
+            if(node.getName() === src){
+                node.addEdge(dst,weight);
+            }
+        });
+    }
     getAllEdges(){
         var allEdges = [];
         this.nodeList.forEach(node =>{
             var tempEdges = node.getEdges();
-            tempEdges.forEach(edge =>{
-                allEdges.push(edge);
-            });
+            if(tempEdges.length !== 0){
+            
+                tempEdges.forEach(edge =>{
+                    allEdges.push(edge);
+                });
+            }   
         });
         return allEdges;
     }
@@ -163,7 +175,11 @@ class Graph{
     }
 
     printNodesAndEdges() {
+
         console.log(`Nodes and Edges in Graph ${this.name}:`);
+        if(this.nodeList.length === 0){
+            return;
+        }
         this.nodeList.forEach((node) => {
           console.log(`Node: ${node.getName()}`);
           node.printEdges();
