@@ -695,7 +695,7 @@ const handleButtonPress = async () => {
       ...prevPaymentValues,
       totalPrice: totalPriceFromResponse,
     }));
-    alert("BRO WE FUCKING DID IT", totalPriceAI);
+    alert("BRO WE FUCKING DID IT");
   } catch (error) {
     alert("oops, total price:", error)
   }
@@ -725,8 +725,29 @@ return (
         <button className="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg mr-4" type="button" onClick={() => uploadEdgesToFirebase()}>
             Finalize Trip
           </button>
+
+         
+
         </div>
-      </div>
+
+
+        <div className="ml-auto">
+    <button
+      className="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg"
+      type="button"
+      onClick={handleOpening}    >
+      Scan Receipt
+    </button>
+  </div>
+</div>
+
+
+
+
+
+
+
+
       <div className="text-white text-4xl font-semibold mt-6 mb-6">
         Welcome back {name}.
       </div>
@@ -789,7 +810,7 @@ return (
       <div className="text-white text-2xl mb-6">Enter a new Payment</div>
       <div className="flex items-center justify-between mb-6">
         
-        <div className="text-white" onClick = {handleOpeningAI}>
+        <div className="text-white" onClick = {handleOpening}>
           <p>Scan a receipt</p>
           <MdOutlineDocumentScanner size={48} />
         </div>
@@ -802,119 +823,6 @@ return (
       </div>
     </div>
 
-
-
-
-
-    <Modal
-      isOpen={modalIsOpenAI}
-      onRequestClose={closeModalAI}
-      className="modal"
-      overlayClassName="overlay"
-    >
-      <h2 className="text-4xl font-semibold mb-6">Payment Form</h2>
-      <form className="formStyle" onSubmit={handleSubmitAI}>
-
-        
-        <button
-          className="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg absolute right-4 top-4"
-          onClick={handleCloseAI}
-        >
-          <AiOutlineCloseCircle size={48} />
-        </button>
-
-
-
-
-
-        <p className="text-xl mb-2">Price*</p>
-
-        
-
-
-        <p className="text-xl mb-2">Members of Group*</p>
-        <Select
-          isMulti={true}
-          value={selectedUsers}
-          options={allUsers}
-          onChange={handleSelect}
-        />
-        <br />
-        <div className="flex justify-between">
-          <button
-            type="button"
-            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mb-4"
-            onClick={handleSelectAll}
-          >
-            Select All
-          </button>
-          <button
-            type="button"
-            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mb-4"
-            onClick={handleDeselectAll}
-          >
-            Deselect All
-          </button>
-        </div>
-        <p className="text-xl mb-2">Payer*</p>
-        <select
-          name="personPaid"
-          value={paymentValues.personPaid}
-          className="w-full py-2 px-4 mb-4 rounded-lg"
-          onChange={handleChange}
-        >
-          <option value="select">Select</option>
-          {selectedUsers.map((user) => (
-            <option key={user.label} value={user.label}>
-              {user.label}
-            </option>
-          ))}
-        </select>
-        <p className="text-xl mb-2">Additional Info</p>
-        <div className="extraInfo">
-          <input
-            type="date"
-            name="date"
-            value={paymentValues.date}
-            onChange={handleChange}
-            className="w-full py-2 px-4 mb-4 rounded-lg"
-            pattern="^[0-9]*/[0-9]*$"
-          />
-          <br />
-          <input
-            type="text"
-            name="place"
-            value={paymentValues.place}
-            onChange={handleChange}
-            placeholder="Location:"
-            className="placeholder-opacity-50 placeholder-gray-400 w-full py-2 px-4 mb-4 rounded-lg"
-          />
-          <br />
-          <input
-            type="text"
-            name="description"
-            value={paymentValues.description}
-            onChange={handleChange}
-            placeholder="Additional Notes:"
-            className="placeholder-opacity-50 placeholder-gray-400 w-full py-2 px-4 mb-4 rounded-lg"
-          />
-        </div>
-        <br />
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
-        >
-          Submit
-        </button>
-        <br />
-        <button
-          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
-          onClick={handleClose}
-        >
-          Close
-        </button>
-      </form>
-    </Modal>
 
     
 
@@ -958,11 +866,12 @@ Upload and Set Value          </button>    </div>
     </div>
 
 
-
+        <p >Total price may be loading... feel free to move on</p>
         <input
           className="w-full py-2 px-4 mb-4 rounded-lg"
           type="number"
           name="totalPrice"
+          placeholder="Total Price (may be loading)"
           value={paymentValues.totalPrice}
           onChange={handleChange}
         />
