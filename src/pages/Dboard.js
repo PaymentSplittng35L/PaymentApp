@@ -27,6 +27,7 @@ function Dboard() {
   const [readyToUpload,setReadyToUpload] = useState(false);
   const navigate = useNavigate();
   const [closing, setClosing] = useState(false);
+  const [closingAI, setClosingAI] = useState(false);
   const [formValid, setFormValid] = useState(false);
   const [refreshCounter, setRefreshCounter] = useState(0);
   const [buttonFix,setButtonFix] = useState(false);
@@ -312,7 +313,7 @@ function Dboard() {
 
   const handleSubmitAI = (e) => {
     e.preventDefault();
-    if(modalIsOpenAI && !closing){
+    if(modalIsOpenAI && !closingAI){
       if (!validateFormAI()) { //fix this
         alert('Please fill in all required fields.');
         return;
@@ -689,8 +690,9 @@ const handleButtonPress = async () => {
 
     // Update the state or variable with the retrieved value
     setTotalPriceAI(totalPriceFromResponse);
+    alert("BRO WE FUCKING DID IT", totalPriceAI);
   } catch (error) {
-    alert("oops, total price:", totalPriceAI)
+    alert("oops, total price:", error)
   }
 };
 
