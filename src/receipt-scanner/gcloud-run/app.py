@@ -12,6 +12,7 @@ Parses for total value, then returns
 
 """
 
+#dependencies
 import cv2
 from matplotlib import pyplot as plt
 import numpy as np
@@ -197,7 +198,7 @@ def helloFromGit():
     """
     file = request.files['image']
 
-    # Read the file dataq
+    # Read the file data
     image_data = file.read()
     nparr = np.frombuffer(image_data, np.uint8)
     image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
