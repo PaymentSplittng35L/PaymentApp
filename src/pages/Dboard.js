@@ -577,33 +577,44 @@ function Dboard() {
     console.log("Your groupname is ", groupName);
 
   }, [user, loading, navigate, fetchUserName,emptyList, gotGraph]);
-const people = [
-  {
-    name: 'Jane Cooper',
-    title: 'Regional Paradigm Technician',
-    department: 'Optimization',
-    role: 'Admin',
-    email: 'jane.cooper@example.com',
-    image: 'https://bit.ly/33HnjK0',
-  },
-  {
-    name: 'John Doe',
-    title: 'Regional Paradigm Technician',
-    department: 'Optimization',
-    role: 'Tester',
-    email: 'john.doe@example.com',
-    image: 'https://bit.ly/3I9nL2D',
-  },
-  {
-    name: 'Veronica Lodge',
-    title: 'Regional Paradigm Technician',
-    department: 'Optimization',
-    role: ' Software Engineer',
-    email: 'veronica.lodge@example.com',
-    image: 'https://bit.ly/3vaOTe1',
-  },
-  // More people...
-];
+
+
+  
+const [selectedFile, setSelectedFile] = useState(null);
+const handleFileSelect = (event) => {
+  setSelectedFile(event.target.files[0]);
+};
+  
+
+const handleButtonPress = async () => {
+  // try {
+  //   setTotalPriceAI('5');
+  // } catch (error) {
+  //   alert("big fuck");
+  // }
+  
+  
+  try {
+    const formData = new FormData();
+    formData.append('image', selectedFile);
+
+    const response = await fetch('https://receipt-scanner-dctp3pim2q-uc.a.run.app/', {
+      method: 'POST',
+      body: formData,
+    });
+    const totalPriceFromResponse = await response.json();
+
+    // Update the state or variable with the retrieved value
+    //setTotalPriceAI(totalPriceFromResponse);
+    setPaymentValues((prevPaymentValues) => ({
+      ...prevPaymentValues,
+      totalPrice: totalPriceFromResponse,
+    }));
+    alert("BRO WE FUCKING DID IT");
+  } catch (error) {
+    alert("oops, total price:", error)
+  }
+};
 
 
 
@@ -618,6 +629,14 @@ return (
             Finalize Trip
           </button>
         </div>
+        <div className="ml-auto">
+    <button
+      className="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg"
+      type="button"
+      onClick={handleOpening}    >
+      Scan Receipt
+    </button>
+  </div>
       </div>
       <div className="text-white text-4xl font-semibold mt-6 mb-6">
         Welcome back {name}.
@@ -705,6 +724,28 @@ return (
           <AiOutlineCloseCircle size={48} />
         </button>
         <p className="text-xl mb-2">Price*</p>
+        <div>
+      <input
+        className="w-full py-2 px-4 mb-4 rounded-lg"
+        type="file"
+        accept="image/*"
+        onChange={handleFileSelect}
+      />
+      <div>      
+      <button
+            type="button"
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg mb-4"
+            onClick={handleButtonPress}
+          >
+Upload and Set Value          </button>    </div>
+    
+
+
+    </div>
+
+
+        <p >Total price may be loading... feel free to move on</p>
+
         <input
           className="w-full py-2 px-4 mb-4 rounded-lg"
           type="number"
