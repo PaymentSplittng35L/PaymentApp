@@ -19,8 +19,12 @@ from PIL import Image
 from flask import Flask, request, jsonify
 import pytesseract
 from pytesseract import Output
+from flask_cors import CORS
 
+#sets authentication permissions for CORS calls (cross origin resource sharing)
 app = Flask(__name__)
+CORS_HEADERS = ['Content-Type', 'Authorization']
+CORS(app, origins=['http://localhost:3000'], methods=['GET', 'POST', 'OPTIONS'], allow_headers=CORS_HEADERS)
 
 
 #converts colored picture to gray_scale
@@ -167,10 +171,13 @@ def main(image):
 
     #goes through possible numbers and identifies max
     for i in range (size):
-        if float(data['conf'][i]) > 20:
-            if float(data['text'][i]) > max_val:
-                max_val = float(data['text'][i])
-                max_ind = i
+            if float(data['conf'][i]) > 20:
+                try:
+                    if float(data['text'][i]) > max_val and '.' in data['text'][i]:
+                        max_val = float(data['text'][i])
+                        max_ind = i
+                except:
+                    continue
 
     (x, y, width, height) = (data['left'][max_ind], data['top'][max_ind], data['width'][max_ind], data['height'][max_ind])
     img = cv2.rectangle(img, (x,y), (x+width, y+height), (0,0,255), 1)
@@ -188,11 +195,14 @@ def helloFromGit():
         Response object using
         `make_response <http://flask.pocoo.org/docs/1.0/api/#flask.Flask.make_response>`.
     """
-    
-    image_data = request.get_data()
+    file = request.files['image']
+
+    # Read the file data
+    image_data = file.read()
     nparr = np.frombuffer(image_data, np.uint8)
     image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     total = main(image)
+
     return str(total)
 
 if __name__ == "__main__":
