@@ -1,5 +1,9 @@
 ### `SplitPay App - CS35L Final Project:`
 
+# How to Install and Run:
+
+In order to use our application, please go ahead and download all of the files provided in our repostories. Open the project and  
+
 
 
 # Getting Started with Create React App
