@@ -2,7 +2,7 @@
 
 # How to Install and Run:
 
-In order to use our application, please go ahead and download all of the files provided in our repostories. Open the project and  
+In order to use our application, please go ahead and download the PaymentApp.zip. Please unzip the files. Use your terminal or alternative option and cd to PaymentApp-master. From there cd once more to PaymentApp-master. Once you are there, go ahead and npm install and start to run the app locally on localhost-3000. That is all you need to run the app and enjoy!
 
 
 
