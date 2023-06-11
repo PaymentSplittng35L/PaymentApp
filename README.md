@@ -1,78 +1,41 @@
-### `SplitPay App - CS35L Final Project:`
+## SplitPay App - CS35L Final Project:
 
-# How to Install and Run:
+### How to Install and Run:
 
-In order to use our application, please go ahead and download the PaymentApp.zip. Please unzip the files. Use your terminal or alternative option and cd to PaymentApp-master. From there cd once more to PaymentApp-master. Once you are there, go ahead and npm install and start to run the app locally on localhost-3000. That is all you need to run the app and enjoy!
+1) By cloning the Git itself
 
+First, go to your terminal and run 
 
+`git clone https://github.com/PaymentSplittng35L/PaymentApp.git`
 
-# Getting Started with Create React App
+Then run the following:
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+`cd PaymentApp`
 
-## Available Scripts
+Once you are in the folder, simply run the following in succession:
 
-In the project directory, you can run:
+`npm install`
 
-### `npm start`
+`npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+This should open the app in your local browser, named localhost:3000. You will then be able to run and experiment with the app; in particular, if you are a new user consider registering for an account / logging in with Google, then creating a new group to add payments to. 
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+2) By downloading the files
 
-### `npm test`
+Ensure that you are currently on the "master" branch in the GitHub (should be default if you come to the page for the first time). In order to use our application, begin by clicking the green "<> Code" button, then "Download Zip" to download our project as a zip file. 
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+The file should be named "PaymentApp-master.zip". Locate this file on your computer, and if not done automatically by your computer, right click and "Extract All" to create a folder containing the files. 
 
-### `npm run build`
+Copy the path of the newly-created folder; you can do this by right-clicking the file and then selecting "Copy as Path" or similar. Now go to your terminal, and enter the command
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+`cd [FOLDER_PATH]`
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+where FOLDER_PATH is what you just copied. Now, run the command
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+`npm install`
 
-### `npm run eject`
+to install any necessary dependencies. Finally, run 
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+`npm start`
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+to open the app in your local browser, named localhost:3000.
