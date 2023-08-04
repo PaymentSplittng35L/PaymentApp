@@ -46,10 +46,7 @@ function AboutUs() {
               <img src="https://m.media-amazon.com/images/I/7186AqfE-ML.jpg" alt="Pronouns: is/Him" className="max-w-full max-h-48" />
             </div>
             <p className="text-gray-800">
-Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuorfhqp3
-Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuorfhqp3
-Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuorfhqp3
-
+            A talented first-year CS student at UCLA, Rahul specializes in web development and user interfaces, creating visually appealing and functional websites.
            </p>
           </div>
         </Element>
@@ -60,9 +57,7 @@ Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuo
               <img src="https://www.sell2bbnovelties.com/mm5/lego/LEGO_NJ_MF_cole_45.jpg" alt="Payment Splitting" className="max-w-full max-h-48" />
             </div>
             <p className="text-gray-800">
-            Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuorfhqp3
-Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuorfhqp3
-Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuorfhqp3
+            A first-year CS student at UCLA, Vishnu has a strong foundation in data structures and software architecture, known for writing clean and efficient code.
             </p>
           </div>
         </Element>
@@ -73,9 +68,7 @@ Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuo
               <img src="https://m.media-amazon.com/images/I/61BiLeQReOL.jpg" alt="Trip Planning" className="max-w-full max-h-48" />
             </div>
             <p className="text-gray-800">
-            Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuorfhqp3
-Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuorfhqp3
-Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuorfhqp3
+            A first-year CS student at UCLA, Rahul is a dedicated programmer with a passion for algorithms and problem-solving.
             </p>
           </div>
         </Element>
@@ -86,7 +79,7 @@ Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuo
               <img src="https://i5.walmartimages.com/asr/76dd8d42-f32c-4315-9e72-562775542241_1.0f1bc7cd394694f194df8be13f713f3e.jpeg" alt="Trip Planning" className="max-w-full max-h-48" />
             </div>
             <p className="text-gray-800">
-            DUDDEEE I"M LITERALLY THE WHITE NINJA
+            A first-year CS student at UCLA, Gabe is a coding enthusiast with a creative mind and an eye for detail. His passion for problem-solving and dedication to continuous learning inspire us all. In his spare time, Gabe enjoys mountain biking and playing bass.
             </p>
 
           </div>
@@ -98,10 +91,7 @@ Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuo
               <img src="https://m.media-amazon.com/images/I/51ev9k0FzML.jpg" alt="Trip Planning" className="max-w-full max-h-48" />
             </div>
             <p className="text-gray-800">
-            Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuorfhqp3
-Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuorfhqp3
-Writre a descriptiong a aoubeo;iutv weriutvh wpuo chpwuwptruighv ihblvkukuvkqpuorfhqp3
-            </p>
+            A first-year Computer Science and Engineering student at UCLA, Srikar's true passion lies in AI, where he delves deep into the realm of intelligent systems, seeking to shape the future of technology. In his free time, he enjoys playing the guitar and composing melodies.            </p>
           </div>
         </Element>
       </div>
