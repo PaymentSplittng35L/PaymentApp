@@ -176,21 +176,6 @@ class OptimizeCosts{
 
 }
 
-//If there is an edge originating from A with destination B with weight 10 that means A owes B 10
-//We can just log that directly in a list with A -10 and B 10 or other way around i dont remember
-//b4, just whats scraped from firebase directly
-//Basically, we comb through firebase and for each event lets say A payed 100 and there are 5 other members of the group
-//It will do 100/5= 20 and create an edge at each other member to A with weight 20
 
-//Yeah thats true but we already built code for making it a graph so ya basically just like dont wanna build other stuff
-//Plus logging it as a graph could be nice just as a datastructure idk
-//Not a big deal it should work with your algorithm after calling getALlEdges
-
-
-
-//wait if we're doing this delta idea, what is the weight for the edge
-//is this like the values after u go through th ealgorithm or b4? 
-//but what do we use the graph for cuz u could just store the delta values directoly lmao ok
-//yeah true
 
 export { OptimizeCosts }
